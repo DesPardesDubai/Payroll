@@ -19,18 +19,31 @@
   <!-- AUTH SCREEN -->
   <div id="authScreen" class="flex items-center justify-center min-h-screen p-4">
     <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
-      <h1 class="text-2xl font-bold mb-2 text-center">🍽️ DesPardes Payroll</h1>
-      <p class="text-gray-500 text-center mb-4 text-sm">Restaurant Staff Payroll Management System</p>
+      <h1 class="text-2xl font-bold mb-1 text-center">🍽️ DesPardes Payroll</h1>
+      <p class="text-gray-500 text-center mb-4 text-sm">Staff Salary & Loan Management</p>
+      
+      <!-- Tabs -->
+      <div class="flex bg-gray-100 p-1 rounded-lg mb-4">
+        <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-md text-sm font-medium tab-active transition">Sign In</button>
+        <button id="tabSignup" onclick="switchAuthTab('signup')" class="flex-1 py-2 rounded-md text-sm font-medium tab-inactive transition">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
       <form id="loginForm" class="space-y-3">
-        <input type="email" id="authEmail" placeholder="Email" required class="w-full p-3 border rounded">
-        <input type="password" id="authPass" placeholder="Password (min 6 chars)" required minlength="6" class="w-full p-3 border rounded">
-        <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-          <input type="checkbox" id="isSignUp" class="w-4 h-4 rounded border-gray-300">
-          Create new account? (Uncheck to sign in)
-        </label>
-        <button type="submit" id="authBtn" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 font-medium">Continue</button>
-        <p id="authMsg" class="text-sm text-center hidden"></p>
+        <input type="email" id="loginEmail" placeholder="Email" required class="w-full p-3 border rounded">
+        <input type="password" id="loginPass" placeholder="Password" required class="w-full p-3 border rounded">
+        <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 font-medium">Sign In</button>
       </form>
+
+      <!-- Sign Up Form -->
+      <form id="signupForm" class="space-y-3 hidden">
+        <input type="email" id="signupEmail" placeholder="Email" required class="w-full p-3 border rounded">
+        <input type="password" id="signupPass" placeholder="Password (min 6 chars)" required minlength="6" class="w-full p-3 border rounded">
+        <input type="password" id="signupPassConfirm" placeholder="Confirm Password" required minlength="6" class="w-full p-3 border rounded">
+        <button type="submit" id="signupBtn" class="w-full bg-green-600 text-white p-3 rounded hover:bg-green-700 font-medium">Create Account</button>
+      </form>
+
+      <p id="authMsg" class="text-sm text-center mt-3 hidden"></p>
     </div>
   </div>
 
@@ -55,48 +68,89 @@
     let payrollRecords = [];
     const tabs = ['dashboard', 'employees', 'payroll'];
 
-    // ─── AUTH ───────────────────────────────────────────────────────────────
+    // ─── AUTH TAB SWITCHING ──────────────────────────────────────────────────
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const tabLogin = document.getElementById('tabLogin');
+      const tabSignup = document.getElementById('tabSignup');
+      const msg = document.getElementById('authMsg');
+      
+      msg.classList.add('hidden');
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        tabLogin.className = 'flex-1 py-2 rounded-md text-sm font-medium tab-active transition';
+        tabSignup.className = 'flex-1 py-2 rounded-md text-sm font-medium tab-inactive transition';
+      } else {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabLogin.className = 'flex-1 py-2 rounded-md text-sm font-medium tab-inactive transition';
+        tabSignup.className = 'flex-1 py-2 rounded-md text-sm font-medium tab-active transition';
+      }
+    }
+
+    // ─── SHOW AUTH MESSAGE ───────────────────────────────────────────────────
+    function showAuthMsg(text, type = 'error') {
+      const msg = document.getElementById('authMsg');
+      msg.textContent = text;
+      msg.className = `text-sm text-center mt-3 ${type === 'error' ? 'text-red-500' : type === 'success' ? 'text-green-600' : 'text-blue-600'}`;
+      msg.classList.remove('hidden');
+    }
+
+    // ─── SIGN IN ─────────────────────────────────────────────────────────────
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('authBtn');
-      const msg = document.getElementById('authMsg');
-      btn.textContent = 'Processing...'; btn.disabled = true;
-      msg.classList.add('hidden');
+      const btn = document.getElementById('loginBtn');
+      btn.textContent = 'Signing in...'; btn.disabled = true;
 
-      const email = document.getElementById('authEmail').value.trim();
-      const pass = document.getElementById('authPass').value;
-      const isSignUp = document.getElementById('isSignUp').checked;
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
 
-      if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({ email, password: pass });
-        if (error) {
-          msg.textContent = error.message;
-          msg.className = 'text-sm text-center text-red-500';
-          msg.classList.remove('hidden');
-        } else if (data.session) {
-          document.getElementById('authScreen').classList.add('hidden');
-          document.getElementById('appScreen').classList.remove('hidden');
-          loadAllData();
-        } else {
-          msg.textContent = 'Account created! Check your email to confirm, then sign in.';
-          msg.className = 'text-sm text-center text-blue-600';
-          msg.classList.remove('hidden');
-        }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) {
+        showAuthMsg('Invalid email or password. Please try again.');
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
-        if (error) {
-          msg.textContent = 'Invalid email or password. Create an account if you\'re new.';
-          msg.className = 'text-sm text-center text-red-500';
-          msg.classList.remove('hidden');
-        } else {
-          document.getElementById('authScreen').classList.add('hidden');
-          document.getElementById('appScreen').classList.remove('hidden');
-          loadAllData();
-        }
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
+        loadAllData();
       }
-      btn.disabled = false; btn.textContent = 'Continue';
+      btn.disabled = false; btn.textContent = 'Sign In';
     });
 
+    // ─── SIGN UP ─────────────────────────────────────────────────────────────
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('signupBtn');
+      btn.textContent = 'Creating account...'; btn.disabled = true;
+
+      const email = document.getElementById('signupEmail').value.trim();
+      const pass = document.getElementById('signupPass').value;
+      const passConfirm = document.getElementById('signupPassConfirm').value;
+
+      if (pass !== passConfirm) {
+        showAuthMsg('Passwords do not match.');
+        btn.disabled = false; btn.textContent = 'Create Account';
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({ email, password: pass });
+      if (error) {
+        showAuthMsg(error.message);
+      } else if (data.session) {
+        showAuthMsg('Account created! Logging you in...', 'success');
+        setTimeout(() => {
+          document.getElementById('authScreen').classList.add('hidden');
+          document.getElementById('appScreen').classList.remove('hidden');
+          loadAllData();
+        }, 500);
+      } else {
+        showAuthMsg('Account created! Please check your email to confirm, then sign in.', 'info');
+      }
+      btn.disabled = false; btn.textContent = 'Create Account';
+    });
+
+    // ─── LOGOUT ──────────────────────────────────────────────────────────────
     async function logout() {
       await supabase.auth.signOut();
       location.reload();
@@ -107,8 +161,8 @@
       showLoader();
       const { data: empData, error: eErr } = await supabase.from('employees').select('*').order('name');
       const { data: payData, error: pErr } = await supabase.from('payroll_records').select('*, employees(name)');
-      if (eErr) alert('DB Error: ' + eErr.message);
-      if (pErr) alert('DB Error: ' + pErr.message);
+      if (eErr) alert('Database error: ' + eErr.message);
+      if (pErr) alert('Database error: ' + pErr.message);
       employees = empData || [];
       payrollRecords = payData || [];
       hideLoader();
@@ -272,10 +326,10 @@
       loadAllData();
     }
 
-    // Init
+    // ─── INIT: CHECK EXISTING SESSION ────────────────────────────────────────
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
         loadAllData();
