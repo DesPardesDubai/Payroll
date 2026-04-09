@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DesPardes Dubai - Payroll Manager</title>
+  <title>DesPardes Payroll</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -11,7 +11,7 @@
 
   <div id="authContainer" class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
     <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">🍽️ DesPardes Payroll</h1>
+      <h1 class="text-2xl font-bold">🍽️ DesPardes Payroll</h1>
       <p class="text-gray-500 text-sm mt-1">Staff Salary & Loan Management</p>
     </div>
 
@@ -50,7 +50,6 @@
   </div>
 
   <script>
-    // FIXED: Use different variable name
     const SB_URL = 'https://lqolicwuailbemonuaor.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxb2xpY3d1YWlsYmVtb251YW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDEzMjIsImV4cCI6MjA5MTMxNzMyMn0.WdEHwSJXM1hTXrlM5Rebs5PnyUDmO0DYHv05D-BgIWo';
     const sb = window.supabase.createClient(SB_URL, SB_KEY);
@@ -78,35 +77,35 @@
       }
     }
 
-    function showMsg(text, ok = false) {
+    function showMsg(text, ok) {
       const el = document.getElementById('authMsg');
       el.textContent = text;
-      el.className = `mt-4 text-sm text-center p-3 rounded ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+      el.className = 'mt-4 text-sm text-center p-3 rounded ' + (ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700');
       el.classList.remove('hidden');
     }
 
     async function doSignIn(e) {
       e.preventDefault();
-      const { data, error } = await sb.auth.signInWithPassword({
+      var result = await sb.auth.signInWithPassword({
         email: document.getElementById('inEmail').value,
         password: document.getElementById('inPass').value
       });
-      if (error) showMsg('Invalid login');
+      if (result.error) showMsg('Invalid login');
       else showApp();
     }
 
     async function doSignUp(e) {
       e.preventDefault();
-      const pass = document.getElementById('upPass').value;
-      const pass2 = document.getElementById('upPass2').value;
+      var pass = document.getElementById('upPass').value;
+      var pass2 = document.getElementById('upPass2').value;
       if (pass !== pass2) return showMsg('Passwords mismatch');
       
-      const { data, error } = await sb.auth.signUp({
+      var result = await sb.auth.signUp({
         email: document.getElementById('upEmail').value,
         password: pass
       });
-      if (error) showMsg(error.message);
-      else if (data.session) showApp();
+      if (result.error) showMsg(result.error.message);
+      else if (result.data.session) showApp();
       else showMsg('Check email to confirm', true);
     }
 
@@ -123,69 +122,88 @@
     }
 
     async function loadData() {
-      const {  eData } = await sb.from('employees').select('*');
-      const {  pData } = await sb.from('payroll_records').select('*, employees(name)');
-      employees = eData || [];
-      payrollRecords = pData || [];
+      var empResult = await sb.from('employees').select('*');
+      var payResult = await sb.from('payroll_records').select('*, employees(name)');
+      employees = empResult.data || [];
+      payrollRecords = payResult.data || [];
       showPage('dashboard');
     }
 
     function showPage(page) {
-      document.querySelectorAll('[data-page]').forEach(b => {
+      document.querySelectorAll('[data-page]').forEach(function(b) {
         b.className = b.dataset.page === page ? 'px-4 py-2 rounded bg-blue-600 text-white' : 'px-4 py-2 rounded text-gray-600 hover:bg-gray-100';
       });
       
-      const c = document.getElementById('mainContent');
+      var c = document.getElementById('mainContent');
       if (page === 'dashboard') {
-        const total = payrollRecords.reduce((s,r) => s + parseFloat(r.net_payable||0), 0);
-        c.innerHTML = `<h2 class="text-xl font-bold mb-4">Dashboard</h2><div class="grid grid-cols-3 gap-4"><div class="p-4 bg-blue-50 rounded"><p class="text-2xl font-bold text-blue-600">${employees.length}</p><p class="text-sm text-gray-600">Employees</p></div><div class="p-4 bg-green-50 rounded"><p class="text-2xl font-bold text-green-600">$${total.toFixed(2)}</p><p class="text-sm text-gray-600">Total Paid</p></div></div>`;
+        var total = payrollRecords.reduce(function(s,r) { return s + parseFloat(r.net_payable||0); }, 0);
+        c.innerHTML = '<h2 class="text-xl font-bold mb-4">Dashboard</h2><div class="grid grid-cols-3 gap-4"><div class="p-4 bg-blue-50 rounded"><p class="text-2xl font-bold text-blue-600">' + employees.length + '</p><p class="text-sm text-gray-600">Employees</p></div><div class="p-4 bg-green-50 rounded"><p class="text-2xl font-bold text-green-600">$' + total.toFixed(2) + '</p><p class="text-sm text-gray-600">Total Paid</p></div></div>';
       }
       else if (page === 'employees') {
-        c.innerHTML = `<h2 class="text-xl font-bold mb-4">Employees</h2><form onsubmit="addEmp(event)" class="flex gap-2 mb-4"><input name="n" required placeholder="Name" class="flex-1 px-3 py-2 border rounded"><input name="r" placeholder="Role" class="flex-1 px-3 py-2 border rounded"><input name="s" type="number" step="0.01" required placeholder="Salary" class="flex-1 px-3 py-2 border rounded"><button class="px-4 py-2 bg-green-600 text-white rounded">Add</button></form><table class="w-full"><thead><tr class="text-left border-b"><th>Name</th><th>Role</th><th>Salary</th><th>Loan Balance</th></tr></thead><tbody>${employees.map(e => `<tr class="border-b"><td class="py-2">${e.name}</td><td>${e.role||'-'}</td><td>$${e.base_salary}</td><td class="${e.loan_balance>0?'text-red-600':'text-green-600'}">$${e.loan_balance||0}</td></tr>`).join('')}</tbody></table>`;
+        var rows = employees.map(function(e) {
+          return '<tr class="border-b"><td class="py-2">' + e.name + '</td><td>' + (e.role||'-') + '</td><td>$' + e.base_salary + '</td><td class="' + (e.loan_balance>0?'text-red-600':'text-green-600') + '">$' + (e.loan_balance||0) + '</td></tr>';
+        }).join('');
+        c.innerHTML = '<h2 class="text-xl font-bold mb-4">Employees</h2><form onsubmit="addEmp(event)" class="flex gap-2 mb-4"><input name="n" required placeholder="Name" class="flex-1 px-3 py-2 border rounded"><input name="r" placeholder="Role" class="flex-1 px-3 py-2 border rounded"><input name="s" type="number" step="0.01" required placeholder="Salary" class="flex-1 px-3 py-2 border rounded"><button class="px-4 py-2 bg-green-600 text-white rounded">Add</button></form><table class="w-full"><thead><tr class="text-left border-b"><th>Name</th><th>Role</th><th>Salary</th><th>Loan Balance</th></tr></thead><tbody>' + (rows || '<tr><td colspan="4" class="py-4 text-center text-gray-500">No employees</td></tr>') + '</tbody></table>';
       }
       else if (page === 'payroll') {
-        const opts = employees.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
-        c.innerHTML = `<h2 class="text-xl font-bold mb-4">Payroll</h2><form onsubmit="addPayroll(event)" class="grid grid-cols-2 gap-3 mb-6 bg-gray-50 p-4 rounded"><select name="eid" required class="px-3 py-2 border rounded"><option value="">Select Employee</option>${opts}</select><input name="m" type="number" min="1" max="12" value="${new Date().getMonth()+1}" required placeholder="Month" class="px-3 py-2 border rounded"><input name="y" type="number" value="${new Date().getFullYear()}" required placeholder="Year" class="px-3 py-2 border rounded"><input name="b" type="number" step="0.01" value="0" placeholder="Bonuses" class="px-3 py-2 border rounded"><input name="p" type="number" step="0.01" value="0" placeholder="Penalties" class="px-3 py-2 border rounded"><input name="l" type="number" step="0.01" value="0" placeholder="Leave Pay" class="px-3 py-2 border rounded"><input name="g" type="number" step="0.01" value="0" placeholder="Gratuity" class="px-3 py-2 border rounded"><input name="la" type="number" step="0.01" value="0" placeholder="Loans Given" class="px-3 py-2 border rounded"><input name="lr" type="number" step="0.01" value="0" placeholder="Loans Repaid" class="px-3 py-2 border rounded"><button type="submit" class="col-span-2 px-4 py-2 bg-blue-600 text-white rounded">Save</button></form>`;
+        var opts = employees.map(function(e) { return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('');
+        var today = new Date();
+        c.innerHTML = '<h2 class="text-xl font-bold mb-4">Payroll</h2><form onsubmit="addPayroll(event)" class="grid grid-cols-2 gap-3 mb-6 bg-gray-50 p-4 rounded"><select name="eid" required class="px-3 py-2 border rounded"><option value="">Select Employee</option>' + opts + '</select><input name="m" type="number" min="1" max="12" value="' + (today.getMonth()+1) + '" required placeholder="Month" class="px-3 py-2 border rounded"><input name="y" type="number" value="' + today.getFullYear() + '" required placeholder="Year" class="px-3 py-2 border rounded"><input name="b" type="number" step="0.01" value="0" placeholder="Bonuses" class="px-3 py-2 border rounded"><input name="p" type="number" step="0.01" value="0" placeholder="Penalties" class="px-3 py-2 border rounded"><input name="l" type="number" step="0.01" value="0" placeholder="Leave Pay" class="px-3 py-2 border rounded"><input name="g" type="number" step="0.01" value="0" placeholder="Gratuity" class="px-3 py-2 border rounded"><input name="la" type="number" step="0.01" value="0" placeholder="Loans Given" class="px-3 py-2 border rounded"><input name="lr" type="number" step="0.01" value="0" placeholder="Loans Repaid" class="px-3 py-2 border rounded"><button type="submit" class="col-span-2 px-4 py-2 bg-blue-600 text-white rounded">Save</button></form>';
       }
     }
 
     async function addEmp(e) {
       e.preventDefault();
-      const fd = new FormData(e.target);
-      await sb.from('employees').insert({ name: fd.get('n'), role: fd.get('r'), base_salary: parseFloat(fd.get('s')), loan_balance: 0 });
+      var fd = new FormData(e.target);
+      await sb.from('employees').insert({ 
+        name: fd.get('n'), 
+        role: fd.get('r'), 
+        base_salary: parseFloat(fd.get('s')), 
+        loan_balance: 0 
+      });
       loadData();
     }
 
     async function addPayroll(e) {
       e.preventDefault();
-      const fd = new FormData(e.target);
-      const emp = employees.find(x => x.id === fd.get('eid'));
-      const month = parseInt(fd.get('m'));
-      const year = parseInt(fd.get('y'));
-      const bonuses = parseFloat(fd.get('b')) || 0;
-      const penalties = parseFloat(fd.get('p')) || 0;
-      const leavePay = parseFloat(fd.get('l')) || 0;
-      const gratuity = parseFloat(fd.get('g')) || 0;
-      const loansAdv = parseFloat(fd.get('la')) || 0;
-      const loansRep = parseFloat(fd.get('lr')) || 0;
-      const net = emp.base_salary + bonuses + leavePay + gratuity - penalties - loansRep;
+      var fd = new FormData(e.target);
+      var emp = employees.find(function(x) { return x.id === fd.get('eid'); });
+      var month = parseInt(fd.get('m'));
+      var year = parseInt(fd.get('y'));
+      var bonuses = parseFloat(fd.get('b')) || 0;
+      var penalties = parseFloat(fd.get('p')) || 0;
+      var leavePay = parseFloat(fd.get('l')) || 0;
+      var gratuity = parseFloat(fd.get('g')) || 0;
+      var loansAdv = parseFloat(fd.get('la')) || 0;
+      var loansRep = parseFloat(fd.get('lr')) || 0;
+      var net = emp.base_salary + bonuses + leavePay + gratuity - penalties - loansRep;
 
       await sb.from('payroll_records').upsert({
-        employee_id: emp.id, month, year, base_salary: emp.base_salary, bonuses, penalties,
-        leave_pay: leavePay, gratuity, loans_advanced: loansAdv, loans_repaid: loansRep, net_payable: net
+        employee_id: emp.id, 
+        month: month, 
+        year: year, 
+        base_salary: emp.base_salary, 
+        bonuses: bonuses, 
+        penalties: penalties,
+        leave_pay: leavePay, 
+        gratuity: gratuity, 
+        loans_advanced: loansAdv, 
+        loans_repaid: loansRep, 
+        net_payable: net
       }, { onConflict: 'employee_id,month,year' });
 
-      const newBal = (emp.loan_balance || 0) + loansAdv - loansRep;
+      var newBal = (emp.loan_balance || 0) + loansAdv - loansRep;
       await sb.from('employees').update({ loan_balance: newBal }).eq('id', emp.id);
       
-      alert(`Saved! Net: $${net.toFixed(2)}`);
+      alert('Saved! Net: $' + net.toFixed(2));
       loadData();
     }
 
     // Check existing session
-    (async () => {
-      const {  { session } } = await sb.auth.getSession();
-      if (session) showApp();
+    (function() {
+      sb.auth.getSession().then(function(result) {
+        if (result.data && result.data.session) showApp();
+      });
     })();
   </script>
 </body>
