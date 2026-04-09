@@ -6,403 +6,186 @@
   <title>DesPardes Dubai - Payroll Manager</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f9fafb; }
-    .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
 
-  <!-- AUTH CONTAINER -->
   <div id="authContainer" class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
     <div class="text-center mb-6">
       <h1 class="text-2xl font-bold text-gray-900">🍽️ DesPardes Payroll</h1>
       <p class="text-gray-500 text-sm mt-1">Staff Salary & Loan Management</p>
     </div>
 
-    <!-- TABS -->
     <div class="flex bg-gray-100 rounded-lg p-1 mb-6">
-      <button id="signInTab" class="flex-1 py-2 px-4 rounded-md text-sm font-semibold bg-blue-600 text-white transition" onclick="showTab('signIn')">Sign In</button>
-      <button id="signUpTab" class="flex-1 py-2 px-4 rounded-md text-sm font-semibold text-gray-600 transition" onclick="showTab('signUp')">Create Account</button>
+      <button id="tabSignIn" class="flex-1 py-2 rounded-md text-sm font-semibold bg-blue-600 text-white" onclick="showTab('signIn')">Sign In</button>
+      <button id="tabSignUp" class="flex-1 py-2 rounded-md text-sm font-semibold text-gray-600" onclick="showTab('signUp')">Create Account</button>
     </div>
 
-    <!-- SIGN IN FORM -->
-    <form id="signInForm" onsubmit="handleSignIn(event)">
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input type="email" id="signInEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="you@example.com">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input type="password" id="signInPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="••••••••">
-        </div>
-        <button type="submit" id="signInBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">Sign In</button>
-      </div>
+    <form id="formSignIn" onsubmit="doSignIn(event)">
+      <input type="email" id="inEmail" required placeholder="Email" class="w-full px-4 py-2 border rounded-lg mb-3">
+      <input type="password" id="inPass" required placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-3">
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold">Sign In</button>
     </form>
 
-    <!-- SIGN UP FORM (Hidden by default) -->
-    <form id="signUpForm" class="hidden" onsubmit="handleSignUp(event)">
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input type="email" id="signUpEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="you@example.com">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Password (min 6 characters)</label>
-          <input type="password" id="signUpPassword" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="••••••••">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-          <input type="password" id="signUpPasswordConfirm" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="••••••••">
-        </div>
-        <button type="submit" id="signUpBtn" class="w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition">Create Account</button>
-      </div>
+    <form id="formSignUp" class="hidden" onsubmit="doSignUp(event)">
+      <input type="email" id="upEmail" required placeholder="Email" class="w-full px-4 py-2 border rounded-lg mb-3">
+      <input type="password" id="upPass" required minlength="6" placeholder="Password (min 6)" class="w-full px-4 py-2 border rounded-lg mb-3">
+      <input type="password" id="upPass2" required minlength="6" placeholder="Confirm Password" class="w-full px-4 py-2 border rounded-lg mb-3">
+      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold">Create Account</button>
     </form>
 
-    <!-- MESSAGE AREA -->
-    <div id="authMessage" class="mt-4 text-sm text-center hidden"></div>
+    <div id="authMsg" class="mt-4 text-sm text-center hidden"></div>
   </div>
 
-  <!-- MAIN APP (Hidden until logged in) -->
   <div id="appContainer" class="hidden w-full max-w-6xl mx-auto p-4 md:p-8">
-    <header class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-      <h1 class="text-2xl font-bold text-gray-800">🍽️ DesPardes Payroll</h1>
-      <div class="flex items-center gap-3">
-        <nav class="flex bg-white rounded-lg shadow-sm p-1 gap-1">
-          <button onclick="switchTab('dashboard')" class="nav-btn px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white" data-tab="dashboard">Dashboard</button>
-          <button onclick="switchTab('employees')" class="nav-btn px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100" data-tab="employees">Employees</button>
-          <button onclick="switchTab('payroll')" class="nav-btn px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100" data-tab="payroll">Payroll</button>
-        </nav>
-        <button onclick="handleLogout()" class="text-gray-500 hover:text-red-600 text-sm font-medium">Logout</button>
+    <header class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">🍽️ DesPardes Payroll</h1>
+      <div class="flex gap-2">
+        <button onclick="showPage('dashboard')" class="px-4 py-2 rounded bg-blue-600 text-white" data-page="dashboard">Dashboard</button>
+        <button onclick="showPage('employees')" class="px-4 py-2 rounded text-gray-600 hover:bg-gray-100" data-page="employees">Employees</button>
+        <button onclick="showPage('payroll')" class="px-4 py-2 rounded text-gray-600 hover:bg-gray-100" data-page="payroll">Payroll</button>
+        <button onclick="doLogout()" class="px-4 py-2 rounded text-red-600 hover:bg-red-50">Logout</button>
       </div>
     </header>
-
-    <main id="mainContent" class="bg-white rounded-xl shadow-lg p-6">
-      <!-- Content loaded dynamically -->
-    </main>
+    <main id="mainContent" class="bg-white rounded-xl shadow-lg p-6"></main>
   </div>
 
   <script>
-    // ─── SUPABASE CONFIG ─────────────────────────────────────────────────────
-    const SUPABASE_URL = 'https://lqolicwuailbemonuaor.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxb2xpY3d1YWlsYmVtb251YW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDEzMjIsImV4cCI6MjA5MTMxNzMyMn0.WdEHwSJXM1hTXrlM5Rebs5PnyUDmO0DYHv05D-BgIWo';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // FIXED: Use different variable name
+    const SB_URL = 'https://lqolicwuailbemonuaor.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxb2xpY3d1YWlsYmVtb251YW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDEzMjIsImV4cCI6MjA5MTMxNzMyMn0.WdEHwSJXM1hTXrlM5Rebs5PnyUDmO0DYHv05D-BgIWo';
+    const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
     let employees = [];
     let payrollRecords = [];
 
-    // ─── AUTH TAB SWITCHING ──────────────────────────────────────────────────
     function showTab(tab) {
-      const signInForm = document.getElementById('signInForm');
-      const signUpForm = document.getElementById('signUpForm');
-      const signInTabBtn = document.getElementById('signInTab');
-      const signUpTabBtn = document.getElementById('signUpTab');
-      const msg = document.getElementById('authMessage');
-
-      msg.classList.add('hidden');
+      const formIn = document.getElementById('formSignIn');
+      const formUp = document.getElementById('formSignUp');
+      const tabIn = document.getElementById('tabSignIn');
+      const tabUp = document.getElementById('tabSignUp');
+      document.getElementById('authMsg').classList.add('hidden');
 
       if (tab === 'signIn') {
-        signInForm.classList.remove('hidden');
-        signUpForm.classList.add('hidden');
-        signInTabBtn.className = 'flex-1 py-2 px-4 rounded-md text-sm font-semibold bg-blue-600 text-white transition';
-        signUpTabBtn.className = 'flex-1 py-2 px-4 rounded-md text-sm font-semibold text-gray-600 transition';
+        formIn.classList.remove('hidden');
+        formUp.classList.add('hidden');
+        tabIn.className = 'flex-1 py-2 rounded-md text-sm font-semibold bg-blue-600 text-white';
+        tabUp.className = 'flex-1 py-2 rounded-md text-sm font-semibold text-gray-600';
       } else {
-        signInForm.classList.add('hidden');
-        signUpForm.classList.remove('hidden');
-        signInTabBtn.className = 'flex-1 py-2 px-4 rounded-md text-sm font-semibold text-gray-600 transition';
-        signUpTabBtn.className = 'flex-1 py-2 px-4 rounded-md text-sm font-semibold bg-green-600 text-white transition';
+        formIn.classList.add('hidden');
+        formUp.classList.remove('hidden');
+        tabIn.className = 'flex-1 py-2 rounded-md text-sm font-semibold text-gray-600';
+        tabUp.className = 'flex-1 py-2 rounded-md text-sm font-semibold bg-green-600 text-white';
       }
     }
 
-    function showMessage(text, type = 'error') {
-      const msg = document.getElementById('authMessage');
-      msg.textContent = text;
-      msg.className = `mt-4 text-sm text-center p-3 rounded-lg ${type === 'error' ? 'bg-red-50 text-red-600' : type === 'success' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`;
-      msg.classList.remove('hidden');
+    function showMsg(text, ok = false) {
+      const el = document.getElementById('authMsg');
+      el.textContent = text;
+      el.className = `mt-4 text-sm text-center p-3 rounded ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+      el.classList.remove('hidden');
     }
 
-    // ─── SIGN IN ─────────────────────────────────────────────────────────────
-    async function handleSignIn(e) {
+    async function doSignIn(e) {
       e.preventDefault();
-      const btn = document.getElementById('signInBtn');
-      const email = document.getElementById('signInEmail').value.trim();
-      const password = document.getElementById('signInPassword').value;
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loader inline-block"></span> Signing in...';
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        showMessage('Invalid email or password. Please try again.');
-        btn.disabled = false;
-        btn.textContent = 'Sign In';
-      } else {
-        showApp();
-      }
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: document.getElementById('inEmail').value,
+        password: document.getElementById('inPass').value
+      });
+      if (error) showMsg('Invalid login');
+      else showApp();
     }
 
-    // ─── SIGN UP ─────────────────────────────────────────────────────────────
-    async function handleSignUp(e) {
+    async function doSignUp(e) {
       e.preventDefault();
-      const btn = document.getElementById('signUpBtn');
-      const email = document.getElementById('signUpEmail').value.trim();
-      const password = document.getElementById('signUpPassword').value;
-      const passwordConfirm = document.getElementById('signUpPasswordConfirm').value;
-
-      if (password !== passwordConfirm) {
-        showMessage('Passwords do not match!');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loader inline-block"></span> Creating account...';
-
-      const { data, error } = await supabase.auth.signUp({ email, password });
-
-      if (error) {
-        showMessage(error.message);
-        btn.disabled = false;
-        btn.textContent = 'Create Account';
-      } else if (data.session) {
-        showMessage('Account created successfully! Logging you in...', 'success');
-        setTimeout(showApp, 1000);
-      } else {
-        showMessage('Account created! Please check your email to confirm.', 'info');
-        btn.disabled = false;
-        btn.textContent = 'Create Account';
-      }
+      const pass = document.getElementById('upPass').value;
+      const pass2 = document.getElementById('upPass2').value;
+      if (pass !== pass2) return showMsg('Passwords mismatch');
+      
+      const { data, error } = await sb.auth.signUp({
+        email: document.getElementById('upEmail').value,
+        password: pass
+      });
+      if (error) showMsg(error.message);
+      else if (data.session) showApp();
+      else showMsg('Check email to confirm', true);
     }
 
-    // ─── LOGOUT ──────────────────────────────────────────────────────────────
-    async function handleLogout() {
-      await supabase.auth.signOut();
+    async function doLogout() {
+      await sb.auth.signOut();
       location.reload();
     }
 
-    // ─── SHOW APP ────────────────────────────────────────────────────────────
     function showApp() {
       document.getElementById('authContainer').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
       document.body.classList.remove('flex', 'items-center', 'justify-center');
-      document.body.classList.add('bg-gray-50');
-      loadAllData();
+      loadData();
     }
 
-    // ─── LOAD DATA ───────────────────────────────────────────────────────────
-    async function loadAllData() {
-      document.getElementById('mainContent').innerHTML = '<div class="flex justify-center py-12"><div class="loader"></div></div>';
+    async function loadData() {
+      const {  eData } = await sb.from('employees').select('*');
+      const {  pData } = await sb.from('payroll_records').select('*, employees(name)');
+      employees = eData || [];
+      payrollRecords = pData || [];
+      showPage('dashboard');
+    }
+
+    function showPage(page) {
+      document.querySelectorAll('[data-page]').forEach(b => {
+        b.className = b.dataset.page === page ? 'px-4 py-2 rounded bg-blue-600 text-white' : 'px-4 py-2 rounded text-gray-600 hover:bg-gray-100';
+      });
       
-      const { data: empData, error: empErr } = await supabase.from('employees').select('*').order('name');
-      const { data: payData, error: payErr } = await supabase.from('payroll_records').select('*, employees(name)').order('created_at', { ascending: false });
-
-      if (empErr) console.error('Employee error:', empErr);
-      if (payErr) console.error('Payroll error:', payErr);
-
-      employees = empData || [];
-      payrollRecords = payData || [];
-
-      renderDashboard();
-    }
-
-    // ─── NAVIGATION ──────────────────────────────────────────────────────────
-    function switchTab(tabName) {
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        if (btn.dataset.tab === tabName) {
-          btn.className = 'nav-btn px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white';
-        } else {
-          btn.className = 'nav-btn px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100';
-        }
-      });
-
-      if (tabName === 'dashboard') renderDashboard();
-      else if (tabName === 'employees') renderEmployees();
-      else if (tabName === 'payroll') renderPayroll();
-    }
-
-    // ─── DASHBOARD ───────────────────────────────────────────────────────────
-    function renderDashboard() {
-      const totalPaid = payrollRecords.reduce((sum, r) => sum + (parseFloat(r.net_payable) || 0), 0);
-      const totalLoans = employees.reduce((sum, e) => sum + (parseFloat(e.loan_balance) || 0), 0);
-
-      document.getElementById('mainContent').innerHTML = `
-        <h2 class="text-xl font-bold mb-6">Dashboard Overview</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div class="bg-blue-50 p-6 rounded-xl">
-            <p class="text-gray-600 text-sm mb-1">Total Employees</p>
-            <p class="text-3xl font-bold text-blue-600">${employees.length}</p>
-          </div>
-          <div class="bg-green-50 p-6 rounded-xl">
-            <p class="text-gray-600 text-sm mb-1">Total Paid (All Time)</p>
-            <p class="text-3xl font-bold text-green-600">$${totalPaid.toFixed(2)}</p>
-          </div>
-          <div class="bg-red-50 p-6 rounded-xl">
-            <p class="text-gray-600 text-sm mb-1">Outstanding Loans</p>
-            <p class="text-3xl font-bold text-red-600">$${totalLoans.toFixed(2)}</p>
-          </div>
-        </div>
-        <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-600">
-          <p>✅ Your data is securely stored in the cloud and syncs across all devices.</p>
-        </div>
-      `;
-    }
-
-    // ─── EMPLOYEES ───────────────────────────────────────────────────────────
-    function renderEmployees() {
-      const rows = employees.map(emp => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="py-3 px-2">${emp.name}</td>
-          <td class="py-3 px-2">${emp.role || '-'}</td>
-          <td class="py-3 px-2">$${parseFloat(emp.base_salary).toFixed(2)}</td>
-          <td class="py-3 px-2 ${emp.loan_balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600'}">$${parseFloat(emp.loan_balance || 0).toFixed(2)}</td>
-          <td class="py-3 px-2"><button onclick="deleteEmployee('${emp.id}')" class="text-red-500 hover:text-red-700 text-sm">Delete</button></td>
-        </tr>
-      `).join('');
-
-      document.getElementById('mainContent').innerHTML = `
-        <h2 class="text-xl font-bold mb-6">Employee Management</h2>
-        <form onsubmit="addEmployee(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6 bg-gray-50 p-4 rounded-lg">
-          <input name="name" required placeholder="Full Name" class="px-3 py-2 border rounded-lg">
-          <input name="role" placeholder="Role (e.g., Chef)" class="px-3 py-2 border rounded-lg">
-          <input name="baseSalary" type="number" step="0.01" min="0" required placeholder="Base Salary" class="px-3 py-2 border rounded-lg">
-          <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700">Add Employee</button>
-        </form>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left">
-            <thead class="bg-gray-100"><tr><th class="py-3 px-2">Name</th><th class="py-3 px-2">Role</th><th class="py-3 px-2">Base Salary</th><th class="py-3 px-2">Loan Balance</th><th class="py-3 px-2">Action</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="5" class="py-8 text-center text-gray-500">No employees yet. Add one above!</td></tr>'}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    async function addEmployee(e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const { error } = await supabase.from('employees').insert({
-        name: formData.get('name'),
-        role: formData.get('role'),
-        base_salary: parseFloat(formData.get('baseSalary')),
-        loan_balance: 0
-      });
-
-      if (error) {
-        alert('Error: ' + error.message);
-      } else {
-        e.target.reset();
-        loadAllData();
-        renderEmployees();
+      const c = document.getElementById('mainContent');
+      if (page === 'dashboard') {
+        const total = payrollRecords.reduce((s,r) => s + parseFloat(r.net_payable||0), 0);
+        c.innerHTML = `<h2 class="text-xl font-bold mb-4">Dashboard</h2><div class="grid grid-cols-3 gap-4"><div class="p-4 bg-blue-50 rounded"><p class="text-2xl font-bold text-blue-600">${employees.length}</p><p class="text-sm text-gray-600">Employees</p></div><div class="p-4 bg-green-50 rounded"><p class="text-2xl font-bold text-green-600">$${total.toFixed(2)}</p><p class="text-sm text-gray-600">Total Paid</p></div></div>`;
+      }
+      else if (page === 'employees') {
+        c.innerHTML = `<h2 class="text-xl font-bold mb-4">Employees</h2><form onsubmit="addEmp(event)" class="flex gap-2 mb-4"><input name="n" required placeholder="Name" class="flex-1 px-3 py-2 border rounded"><input name="r" placeholder="Role" class="flex-1 px-3 py-2 border rounded"><input name="s" type="number" step="0.01" required placeholder="Salary" class="flex-1 px-3 py-2 border rounded"><button class="px-4 py-2 bg-green-600 text-white rounded">Add</button></form><table class="w-full"><thead><tr class="text-left border-b"><th>Name</th><th>Role</th><th>Salary</th><th>Loan Balance</th></tr></thead><tbody>${employees.map(e => `<tr class="border-b"><td class="py-2">${e.name}</td><td>${e.role||'-'}</td><td>$${e.base_salary}</td><td class="${e.loan_balance>0?'text-red-600':'text-green-600'}">$${e.loan_balance||0}</td></tr>`).join('')}</tbody></table>`;
+      }
+      else if (page === 'payroll') {
+        const opts = employees.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+        c.innerHTML = `<h2 class="text-xl font-bold mb-4">Payroll</h2><form onsubmit="addPayroll(event)" class="grid grid-cols-2 gap-3 mb-6 bg-gray-50 p-4 rounded"><select name="eid" required class="px-3 py-2 border rounded"><option value="">Select Employee</option>${opts}</select><input name="m" type="number" min="1" max="12" value="${new Date().getMonth()+1}" required placeholder="Month" class="px-3 py-2 border rounded"><input name="y" type="number" value="${new Date().getFullYear()}" required placeholder="Year" class="px-3 py-2 border rounded"><input name="b" type="number" step="0.01" value="0" placeholder="Bonuses" class="px-3 py-2 border rounded"><input name="p" type="number" step="0.01" value="0" placeholder="Penalties" class="px-3 py-2 border rounded"><input name="l" type="number" step="0.01" value="0" placeholder="Leave Pay" class="px-3 py-2 border rounded"><input name="g" type="number" step="0.01" value="0" placeholder="Gratuity" class="px-3 py-2 border rounded"><input name="la" type="number" step="0.01" value="0" placeholder="Loans Given" class="px-3 py-2 border rounded"><input name="lr" type="number" step="0.01" value="0" placeholder="Loans Repaid" class="px-3 py-2 border rounded"><button type="submit" class="col-span-2 px-4 py-2 bg-blue-600 text-white rounded">Save</button></form>`;
       }
     }
 
-    async function deleteEmployee(id) {
-      if (!confirm('Delete this employee? Past payroll records will remain.')) return;
-      const { error } = await supabase.from('employees').delete().eq('id', id);
-      if (error) alert('Error: ' + error.message);
-      else loadAllData();
-    }
-
-    // ─── PAYROLL ─────────────────────────────────────────────────────────────
-    function renderPayroll() {
-      const today = new Date();
-      const empOptions = employees.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
-      
-      const records = [...payrollRecords].sort((a, b) => {
-        const dateA = `${a.year}-${String(a.month).padStart(2,'0')}`;
-        const dateB = `${b.year}-${String(b.month).padStart(2,'0')}`;
-        return dateB.localeCompare(dateA);
-      });
-
-      const rows = records.map(r => {
-        const emp = employees.find(e => e.id === r.employee_id);
-        return `
-          <tr class="border-b hover:bg-gray-50 text-sm">
-            <td class="py-2 px-1">${String(r.month).padStart(2,'0')}/${r.year}</td>
-            <td class="py-2 px-1">${emp?.name || 'Unknown'}</td>
-            <td class="py-2 px-1">$${parseFloat(r.base_salary).toFixed(2)}</td>
-            <td class="py-2 px-1 text-green-600">+$${parseFloat(r.bonuses||0).toFixed(2)}</td>
-            <td class="py-2 px-1 text-red-600">-$${parseFloat(r.penalties||0).toFixed(2)}</td>
-            <td class="py-2 px-1">$${parseFloat(r.leave_pay||0).toFixed(2)}</td>
-            <td class="py-2 px-1">$${parseFloat(r.gratuity||0).toFixed(2)}</td>
-            <td class="py-2 px-1">$${parseFloat(r.loans_advanced||0).toFixed(2)}</td>
-            <td class="py-2 px-1 text-green-600">-$${parseFloat(r.loans_repaid||0).toFixed(2)}</td>
-            <td class="py-2 px-1 font-bold">$${parseFloat(r.net_payable).toFixed(2)}</td>
-          </tr>
-        `;
-      }).join('');
-
-      document.getElementById('mainContent').innerHTML = `
-        <h2 class="text-xl font-bold mb-6">Monthly Payroll Entry</h2>
-        <form onsubmit="submitPayroll(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6 bg-gray-50 p-4 rounded-lg">
-          <select name="employeeId" required class="px-3 py-2 border rounded-lg"><option value="">Select Employee</option>${empOptions}</select>
-          <input name="month" type="number" min="1" max="12" value="${today.getMonth()+1}" required placeholder="Month (1-12)" class="px-3 py-2 border rounded-lg">
-          <input name="year" type="number" value="${today.getFullYear()}" required placeholder="Year" class="px-3 py-2 border rounded-lg">
-          <input name="bonuses" type="number" step="0.01" min="0" value="0" placeholder="Bonuses" class="px-3 py-2 border rounded-lg">
-          <input name="penalties" type="number" step="0.01" min="0" value="0" placeholder="Penalties" class="px-3 py-2 border rounded-lg">
-          <input name="leavePay" type="number" step="0.01" min="0" value="0" placeholder="Leave Pay" class="px-3 py-2 border rounded-lg">
-          <input name="gratuity" type="number" step="0.01" min="0" value="0" placeholder="Gratuity" class="px-3 py-2 border rounded-lg">
-          <input name="loansAdvanced" type="number" step="0.01" min="0" value="0" placeholder="Loans Given" class="px-3 py-2 border rounded-lg">
-          <input name="loansRepaid" type="number" step="0.01" min="0" value="0" placeholder="Loans Repaid" class="px-3 py-2 border rounded-lg">
-          <button type="submit" class="col-span-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 mt-2">Save Payroll Record</button>
-        </form>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-gray-100"><tr><th class="py-2 px-1">Month</th><th class="py-2 px-1">Employee</th><th class="py-2 px-1">Base</th><th class="py-2 px-1">Bonus</th><th class="py-2 px-1">Penalty</th><th class="py-2 px-1">Leave</th><th class="py-2 px-1">Gratuity</th><th class="py-2 px-1">Loan+</th><th class="py-2 px-1">Loan-</th><th class="py-2 px-1">Net</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="10" class="py-8 text-center text-gray-500">No payroll records yet.</td></tr>'}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    async function submitPayroll(e) {
+    async function addEmp(e) {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const employeeId = formData.get('employeeId');
-      const month = parseInt(formData.get('month'));
-      const year = parseInt(formData.get('year'));
-      const emp = employees.find(e => e.id === employeeId);
+      const fd = new FormData(e.target);
+      await sb.from('employees').insert({ name: fd.get('n'), role: fd.get('r'), base_salary: parseFloat(fd.get('s')), loan_balance: 0 });
+      loadData();
+    }
 
-      const baseSalary = emp.base_salary;
-      const bonuses = parseFloat(formData.get('bonuses')) || 0;
-      const penalties = parseFloat(formData.get('penalties')) || 0;
-      const leavePay = parseFloat(formData.get('leavePay')) || 0;
-      const gratuity = parseFloat(formData.get('gratuity')) || 0;
-      const loansAdvanced = parseFloat(formData.get('loansAdvanced')) || 0;
-      const loansRepaid = parseFloat(formData.get('loansRepaid')) || 0;
-      const netPayable = baseSalary + bonuses + leavePay + gratuity - penalties - loansRepaid;
+    async function addPayroll(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const emp = employees.find(x => x.id === fd.get('eid'));
+      const month = parseInt(fd.get('m'));
+      const year = parseInt(fd.get('y'));
+      const bonuses = parseFloat(fd.get('b')) || 0;
+      const penalties = parseFloat(fd.get('p')) || 0;
+      const leavePay = parseFloat(fd.get('l')) || 0;
+      const gratuity = parseFloat(fd.get('g')) || 0;
+      const loansAdv = parseFloat(fd.get('la')) || 0;
+      const loansRep = parseFloat(fd.get('lr')) || 0;
+      const net = emp.base_salary + bonuses + leavePay + gratuity - penalties - loansRep;
 
-      const { error } = await supabase.from('payroll_records').upsert({
-        employee_id: employeeId,
-        month,
-        year,
-        base_salary: baseSalary,
-        bonuses,
-        penalties,
-        leave_pay: leavePay,
-        gratuity,
-        loans_advanced: loansAdvanced,
-        loans_repaid: loansRepaid,
-        net_payable: netPayable
+      await sb.from('payroll_records').upsert({
+        employee_id: emp.id, month, year, base_salary: emp.base_salary, bonuses, penalties,
+        leave_pay: leavePay, gratuity, loans_advanced: loansAdv, loans_repaid: loansRep, net_payable: net
       }, { onConflict: 'employee_id,month,year' });
 
-      if (error) {
-        alert('Error: ' + error.message);
-      } else {
-        const newBalance = (emp.loan_balance || 0) + loansAdvanced - loansRepaid;
-        await supabase.from('employees').update({ loan_balance: newBalance }).eq('id', employeeId);
-        alert(`✅ Saved! Net Payable: $${netPayable.toFixed(2)}`);
-        loadAllData();
-      }
+      const newBal = (emp.loan_balance || 0) + loansAdv - loansRep;
+      await sb.from('employees').update({ loan_balance: newBal }).eq('id', emp.id);
+      
+      alert(`Saved! Net: $${net.toFixed(2)}`);
+      loadData();
     }
 
-    // ─── INIT: CHECK SESSION ─────────────────────────────────────────────────
+    // Check existing session
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data?.session) {
-        showApp();
-      }
+      const {  { session } } = await sb.auth.getSession();
+      if (session) showApp();
     })();
   </script>
 </body>
