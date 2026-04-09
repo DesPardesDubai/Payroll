@@ -14,22 +14,31 @@
     .sidebar-item:hover { background: #f3f4f6; }
     .sidebar-item.active { background: #fef2f2; color: #dc2626; border-right: 3px solid #dc2626; }
     .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
-    .input-field { width: 100%; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 14px; transition: all 0.2s; }
-    .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+    .input-field { width: 100%; padding: 8px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+    .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .input-sm { width: 100%; padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; text-align: right; }
     .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
     .btn-secondary { background: #f9fafb; color: #374151; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1.5px solid #e5e7eb; }
     .btn-secondary:hover { background: #f3f4f6; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,0.3); }
     .metric-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .badge { padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
     .badge-success { background: #d1fae5; color: #065f46; }
     .badge-danger { background: #fee2e2; color: #991b1b; }
     .table-row:hover { background: #f9fafb; }
     .tab-btn.active { background: #3b82f6; color: white; }
+    /* Table specific styles */
+    .payroll-input { width: 80px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; text-align: right; }
+    .payroll-input:focus { border-color: #3b82f6; outline: none; }
+    .payroll-input.net { background: #f0fdf4; border-color: #86efac; font-weight: bold; color: #166534; }
+    .payroll-input.red { background: #fef2f2; color: #991b1b; }
   </style>
 </head>
 <body class="bg-gray-50">
 
+  <!-- AUTH SCREEN -->
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
     <div class="card p-10 w-full max-w-md shadow-xl">
       <div class="text-center mb-8">
@@ -56,20 +65,21 @@
     </div>
   </div>
 
+  <!-- APP SCREEN -->
   <div id="appScreen" class="hidden min-h-screen bg-gray-50">
     <div class="flex">
       <aside class="w-64 bg-white border-r border-gray-200 fixed h-full overflow-y-auto shadow-sm">
         <div class="p-6 border-b border-gray-100">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl">🇦🇪</div>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl">🇦</div>
             <div><h2 class="text-lg font-bold text-gray-900">DesPardes</h2><p class="text-xs text-gray-500">Payroll Pro • AED</p></div>
           </div>
         </div>
         <nav class="p-4 space-y-1">
           <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="dashboard"><span class="text-xl">📊</span> Dashboard</button>
           <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="employees"><span class="text-xl">👥</span> Employees</button>
-          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="payroll"><span class="text-xl">💰</span> Payroll Entry</button>
-          <button onclick="showPage('bulkPayroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="bulkPayroll"><span class="text-xl">⚡</span> Bulk Payroll</button>
+          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="payroll"><span class="text-xl">💰</span> Single Entry</button>
+          <button onclick="showPage('bulkPayroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="bulkPayroll"><span class="text-xl">📝</span> Bulk Payroll</button>
           <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="loans"><span class="text-xl">💳</span> Loans</button>
           <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="reports"><span class="text-xl">📈</span> Reports</button>
           <div class="pt-4 mt-4 border-t border-gray-100"><button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 text-red-600"><span class="text-xl">🚪</span> Logout</button></div>
@@ -81,6 +91,7 @@
     </div>
   </div>
 
+  <!-- MODAL -->
   <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
     <div class="card p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
       <div id="modalContent"></div>
@@ -181,125 +192,312 @@
         '</div>';
     }
 
+    // ─── EMPLOYEES WITH BULK DELETE ──────────────────────────────────────────
     function renderEmployees(container) {
-      var html = '<div class="flex justify-between items-center mb-8"><div><h1 class="text-3xl font-bold text-gray-900 mb-1">Employees</h1><p class="text-gray-500">Manage your team members</p></div><div class="flex gap-3"><button onclick="showImportExcelModal()" class="btn-secondary flex items-center gap-2">📥 Import Excel</button><button onclick="showAddEmployeeModal()" class="btn-primary flex items-center gap-2">➕ Add Employee</button></div></div>' +
-        '<div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Position</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Salary</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Loan Balance</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Actions</th></tr></thead><tbody>';
+      var html = '<div class="flex justify-between items-center mb-6">' +
+        '<div><h1 class="text-3xl font-bold text-gray-900 mb-1">Employees</h1><p class="text-gray-500">Manage your team members</p></div>' +
+        '<div class="flex gap-3" id="empActions">' +
+          '<button onclick="showImportExcelModal()" class="btn-secondary flex items-center gap-2">📥 Import Excel</button>' +
+          '<button onclick="showAddEmployeeModal()" class="btn-primary flex items-center gap-2">➕ Add Employee</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="bulkDeleteBar" class="hidden bg-red-50 border border-red-200 p-4 rounded-xl mb-6 flex justify-between items-center">' +
+        '<span class="text-red-800 font-semibold">🗑️ <span id="selectedCount">0</span> employees selected</span>' +
+        '<div class="flex gap-3"><button onclick="deselectAllEmployees()" class="text-sm text-red-600 hover:underline">Cancel</button><button onclick="deleteSelectedEmployees()" class="btn-danger py-2 px-4 text-sm">Delete Selected</button></div>' +
+      '</div>' +
+      '<div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b border-gray-200"><tr>' +
+        '<th class="text-left py-4 px-4 w-10"><input type="checkbox" id="selectAllEmp" onchange="toggleSelectAllEmployees(this)"></th>' +
+        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th>' +
+        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Position</th>' +
+        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Salary</th>' +
+        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Loan Balance</th>' +
+        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Actions</th>' +
+      '</tr></thead><tbody id="empTableBody"></tbody></table></div>';
+      
+      container.innerHTML = html;
+      renderEmployeeRows();
+    }
+
+    function renderEmployeeRows() {
+      var tbody = document.getElementById('empTableBody');
+      if (!tbody) return;
+      var html = '';
       employees.forEach(function(emp) {
-        html += '<tr class="table-row border-b border-gray-100"><td class="py-4 px-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">' + emp.name.charAt(0) + '</div><p class="font-semibold text-gray-900">' + emp.name + '</p></div></td>' +
+        html += '<tr class="table-row border-b border-gray-100" id="empRow-' + emp.id + '">' +
+          '<td class="py-4 px-4"><input type="checkbox" class="empCheckbox w-4 h-4 text-blue-600 rounded" value="' + emp.id + '" onchange="updateBulkDeleteBar()"></td>' +
+          '<td class="py-4 px-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">' + emp.name.charAt(0) + '</div><p class="font-semibold text-gray-900">' + emp.name + '</p></div></td>' +
           '<td class="py-4 px-6 text-gray-600">' + (emp.role || '-') + '</td>' +
           '<td class="py-4 px-6 font-semibold text-gray-900">' + fmt(emp.base_salary) + '</td>' +
           '<td class="py-4 px-6"><span class="' + (emp.loan_balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600') + '">' + fmt(emp.loan_balance||0) + '</span></td>' +
-          '<td class="py-4 px-6 flex gap-3"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">History</button><button onclick="deleteEmployee(\'' + emp.id + '\')" class="text-red-600 hover:text-red-700 font-medium text-sm">Delete</button></td></tr>';
+          '<td class="py-4 px-6 flex gap-3"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">History</button><button onclick="deleteEmployee(\'' + emp.id + '\')" class="text-red-600 hover:text-red-700 font-medium text-sm">Delete</button></td>' +
+        '</tr>';
       });
-      html += '</tbody></table></div>';
-      container.innerHTML = html;
+      tbody.innerHTML = html;
     }
 
-    function getDaysInMonth(month, year) { return new Date(year, month, 0).getDate(); }
-
-    function autoUpdateDays() {
-      var month = parseInt(document.getElementById('payMonth')?.value || 1);
-      var year = parseInt(document.getElementById('payYear')?.value || new Date().getFullYear());
-      var totalDays = getDaysInMonth(month, year);
-      var totalDaysInput = document.getElementById('totalDays');
-      var daysWorkedInput = document.getElementById('daysWorked');
-      if (totalDaysInput) totalDaysInput.value = totalDays;
-      if (daysWorkedInput && daysWorkedInput.value > totalDays) daysWorkedInput.value = totalDays;
-      calcActualSalary();
+    function toggleSelectAllEmployees(source) {
+      var checkboxes = document.querySelectorAll('.empCheckbox');
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+      }
+      updateBulkDeleteBar();
     }
 
-    function showImportExcelModal() {
-      document.getElementById('modalContent').innerHTML = 
-        '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Import from Excel</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<div class="mb-6"><p class="text-gray-600 mb-4">Upload your Excel file to bulk import employees</p>' +
-          '<div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4"><p class="text-sm text-blue-800 font-medium mb-2">Supported columns:</p><ul class="text-sm text-blue-700 space-y-1"><li>• Description / Name</li><li>• Position / Role</li><li>• Contracted Salary (AED)</li><li>• Opening Loan Balance (AED, optional)</li></ul></div>' +
-          '<input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="input-field mb-4">' +
+    function updateBulkDeleteBar() {
+      var checkboxes = document.querySelectorAll('.empCheckbox:checked');
+      var bar = document.getElementById('bulkDeleteBar');
+      var countSpan = document.getElementById('selectedCount');
+      var selectAll = document.getElementById('selectAllEmp');
+      
+      countSpan.textContent = checkboxes.length;
+      if (checkboxes.length > 0) {
+        bar.classList.remove('hidden');
+      } else {
+        bar.classList.add('hidden');
+        selectAll.checked = false;
+      }
+    }
+
+    function deselectAllEmployees() {
+      var checkboxes = document.querySelectorAll('.empCheckbox');
+      for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = false;
+      document.getElementById('selectAllEmp').checked = false;
+      updateBulkDeleteBar();
+    }
+
+    async function deleteSelectedEmployees() {
+      var checkboxes = document.querySelectorAll('.empCheckbox:checked');
+      var ids = Array.from(checkboxes).map(function(cb) { return cb.value; });
+      if (ids.length === 0) return;
+      
+      if (!confirm('Are you sure you want to delete ' + ids.length + ' employees? This cannot be undone.')) return;
+      
+      var { error } = await sb.from('employees').delete().in('id', ids);
+      if (error) alert('Error: ' + error.message);
+      else {
+        deselectAllEmployees();
+        loadData();
+      }
+    }
+
+    // ─── BULK PAYROLL (SPREADSHEET STYLE) ────────────────────────────────────
+    function renderBulkPayroll(container) {
+      var today = new Date();
+      var monthDefault = today.getMonth() + 1;
+      var yearDefault = today.getFullYear();
+      var daysInMonth = new Date(yearDefault, monthDefault, 0).getDate();
+
+      var activeEmps = employees.filter(function(e) { return e.status === 'active'; });
+
+      var html = '<div class="flex justify-between items-center mb-6">' +
+        '<div><h1 class="text-3xl font-bold text-gray-900 mb-1">Bulk Payroll Entry</h1><p class="text-gray-500">Enter payroll data for all active employees at once</p></div>' +
+        '<div class="flex items-center gap-3">' +
+          '<div class="flex gap-2">' +
+            '<select id="bpMonth" class="input-field w-32">' +
+              '<option value="1" ' + (monthDefault===1?'selected':'') + '>Jan</option><option value="2" ' + (monthDefault===2?'selected':'') + '>Feb</option><option value="3" ' + (monthDefault===3?'selected':'') + '>Mar</option>' +
+              '<option value="4" ' + (monthDefault===4?'selected':'') + '>Apr</option><option value="5" ' + (monthDefault===5?'selected':'') + '>May</option><option value="6" ' + (monthDefault===6?'selected':'') + '>Jun</option>' +
+              '<option value="7" ' + (monthDefault===7?'selected':'') + '>Jul</option><option value="8" ' + (monthDefault===8?'selected':'') + '>Aug</option><option value="9" ' + (monthDefault===9?'selected':'') + '>Sep</option>' +
+              '<option value="10" ' + (monthDefault===10?'selected':'') + '>Oct</option><option value="11" ' + (monthDefault===11?'selected':'') + '>Nov</option><option value="12" ' + (monthDefault===12?'selected':'') + '>Dec</option>' +
+            '</select>' +
+            '<input type="number" id="bpYear" value="' + yearDefault + '" class="input-field w-24">' +
+            '<input type="number" id="bpTotalDays" value="' + daysInMonth + '" class="input-field w-24">' +
+          '</div>' +
+          '<button onclick="refreshBulkPayroll()" class="btn-secondary">Refresh</button>' +
         '</div>' +
-        '<div class="flex gap-3"><button onclick="processExcelImport()" class="btn-primary flex-1">Import Data</button><button onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div>';
-      document.getElementById('modal').classList.remove('hidden');
-    }
+      '</div>';
 
-    function processExcelImport() {
-      var file = document.getElementById('excelFile').files[0];
-      if (!file) return alert('Please select a file');
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var data = new Uint8Array(e.target.result);
-        var workbook = XLSX.read(data, {type: 'array'});
-        var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        var jsonData = XLSX.utils.sheet_to_json(firstSheet);
-        var count = 0;
-        var promises = [];
-        jsonData.forEach(function(row) {
-          var name = row['Description'] || row['description'] || row['Name'] || row['name'];
-          var position = row['Position'] || row['position'] || row['Role'] || row['role'] || '';
-          var salary = row['Contracted Salary'] || row['Contracted_Salary'] || row['salary'] || row['Salary'] || 0;
-          var loan = row['Opening Loan Balance'] || row['Loan Balance'] || row['loan_balance'] || 0;
-          if (name && salary) {
-            promises.push(sb.from('employees').insert({ name: name, role: position, base_salary: parseFloat(salary), loan_balance: parseFloat(loan), status: 'active' }));
-            count++;
-          }
-        });
-        Promise.all(promises).then(function() { alert('Imported ' + count + ' employees!'); closeModal(); loadData(); }).catch(function(err) { alert('Error: ' + err.message); });
-      };
-      reader.readAsArrayBuffer(file);
-    }
+      html += '<div class="card overflow-hidden p-0">' +
+        '<div class="overflow-x-auto">' +
+          '<table class="w-full text-sm">' +
+            '<thead class="bg-gray-50 border-b border-gray-200 sticky top-0">' +
+              '<tr>' +
+                '<th class="text-left py-3 px-4 font-semibold text-gray-700 w-16">#</th>' +
+                '<th class="text-left py-3 px-4 font-semibold text-gray-700 min-w-[150px]">Employee</th>' +
+                '<th class="text-left py-3 px-2 font-semibold text-gray-700 w-24">Pos</th>' +
+                '<th class="text-left py-3 px-2 font-semibold text-gray-700 w-28">Salary</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-20">Days</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-28">Actual</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-green-700 w-24">Bonus</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-green-700 w-24">Leave</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-green-700 w-24">Gratuity</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-red-700 w-24">Penalty</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-red-700 w-24">Advance</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-red-700 w-24">Loan Ret</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-orange-700 w-24">Loan Giv</th>' +
+                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-24">Other Ded</th>' +
+                '<th class="text-right py-3 px-4 font-bold text-blue-700 w-28 bg-blue-50">Net Payable</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody id="bpTableBody">';
 
-    function showAddEmployeeModal() {
-      document.getElementById('modalContent').innerHTML = 
-        '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Add Employee</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<form onsubmit="addEmployee(event)"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label><input name="name" required class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Position</label><input name="role" class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Contracted Salary (AED) *</label><input name="baseSalary" type="number" step="0.01" required class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Opening Loan Balance (AED)</label><input name="openingLoan" type="number" step="0.01" value="0" class="input-field"></div>' +
-        '</div><div class="flex gap-3"><button type="submit" class="btn-primary flex-1">Save Employee</button><button type="button" onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div></form>';
-      document.getElementById('modal').classList.remove('hidden');
-    }
-
-    async function addEmployee(e) {
-      e.preventDefault();
-      var fd = new FormData(e.target);
-      await sb.from('employees').insert({
-        name: fd.get('name'), role: fd.get('role'), base_salary: parseFloat(fd.get('baseSalary')),
-        loan_balance: parseFloat(fd.get('openingLoan')) || 0, status: 'active'
+      activeEmps.forEach(function(emp, index) {
+        html += '<tr class="border-b border-gray-100" data-emp-id="' + emp.id + '">' +
+          '<td class="py-2 px-4 text-gray-500">' + (index + 1) + '</td>' +
+          '<td class="py-2 px-4 font-medium text-gray-900">' + emp.name + '</td>' +
+          '<td class="py-2 px-2 text-gray-600 text-xs">' + (emp.role || '-') + '</td>' +
+          '<td class="py-2 px-2 font-semibold text-gray-700" data-contracted="' + emp.base_salary + '">' + fmt(emp.base_salary) + '</td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-days" value="' + daysInMonth + '" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2 font-semibold text-gray-800 bp-actual" data-value="0">0.00</td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-bonus" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-leave" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-gratuity" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-penalty" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-advance" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-loan-rep" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-loan-giv" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-other" value="0" min="0" onchange="calcRow(this)"></td>' +
+          '<td class="py-2 px-4 font-bold text-blue-700 bg-blue-50 text-right bp-net">0.00</td>' +
+        '</tr>';
       });
-      closeModal(); loadData();
+
+      html += '</tbody>' +
+        '<tfoot class="bg-gray-50 font-semibold">' +
+          '<tr>' +
+            '<td colspan="4" class="py-3 px-4 text-right">Total Net Payable:</td>' +
+            '<td colspan="10"></td>' +
+            '<td class="py-3 px-4 text-right text-xl text-blue-700" id="totalNetPayable">0.00</td>' +
+          '</tr>' +
+        '</tfoot>' +
+      '</table>' +
+      '</div>' +
+      '<div class="p-4 bg-white border-t border-gray-200 flex justify-end gap-3">' +
+        '<button onclick="showPage(\'dashboard\')" class="btn-secondary">Cancel</button>' +
+        '<button onclick="saveBulkPayroll()" class="btn-primary py-3 px-8 text-base">💾 Save All Records</button>' +
+      '</div>' +
+      '</div>';
+
+      container.innerHTML = html;
+      calcAllRows();
     }
 
-    async function deleteEmployee(id) {
-      if (!confirm('Are you sure you want to delete this employee? Past payroll records will remain.')) return;
-      await sb.from('employees').delete().eq('id', id);
-      loadData();
+    function refreshBulkPayroll() {
+      var month = parseInt(document.getElementById('bpMonth').value);
+      var year = parseInt(document.getElementById('bpYear').value);
+      var totalDays = parseInt(document.getElementById('bpTotalDays').value) || 28;
+      
+      var inputs = document.querySelectorAll('.bp-days');
+      for (var i = 0; i < inputs.length; i++) inputs[i].value = totalDays;
+      calcAllRows();
     }
 
-    function viewEmployeeHistory(empId) {
-      var emp = employees.find(function(e) { return e.id === empId; });
-      var empPayroll = payrollRecords.filter(function(r) { return r.employee_id === empId; });
-      var empLoans = loanTransactions.filter(function(r) { return r.employee_id === empId; });
-      var html = '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">History: ' + emp.name + '</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<h3 class="font-semibold text-gray-900 mb-3">Payroll History</h3><div class="overflow-x-auto mb-6"><table class="w-full text-sm"><thead class="bg-gray-50 rounded-lg"><tr><th class="text-left py-3 px-4 font-medium text-gray-700">Month</th><th class="text-left py-3 px-4 font-medium text-gray-700">Days</th><th class="text-left py-3 px-4 font-medium text-gray-700">Actual Salary</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net Payable</th></tr></thead><tbody>';
-      empPayroll.forEach(function(r) { html += '<tr class="border-b border-gray-100"><td class="py-3 px-4">' + r.month + '/' + r.year + '</td><td class="py-3 px-4">' + (r.days_worked||28) + '/' + (r.total_days||28) + '</td><td class="py-3 px-4">' + fmt(r.actual_salary||r.base_salary) + '</td><td class="py-3 px-4 font-bold">' + fmt(r.net_payable) + '</td></tr>'; });
-      html += '</tbody></table></div><h3 class="font-semibold text-gray-900 mb-3">Loan Transactions</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 rounded-lg"><tr><th class="text-left py-3 px-4 font-medium text-gray-700">Date</th><th class="text-left py-3 px-4 font-medium text-gray-700">Type</th><th class="text-left py-3 px-4 font-medium text-gray-700">Amount</th><th class="text-left py-3 px-4 font-medium text-gray-700">Balance</th></tr></thead><tbody>';
-      empLoans.forEach(function(r) { html += '<tr class="border-b border-gray-100"><td class="py-3 px-4">' + new Date(r.created_at).toLocaleDateString() + '</td><td class="py-3 px-4"><span class="badge ' + (r.type === 'advanced' ? 'badge-danger' : 'badge-success') + '">' + r.type + '</span></td><td class="py-3 px-4">' + fmt(r.amount) + '</td><td class="py-3 px-4 font-semibold">' + fmt(r.balance_after) + '</td></tr>'; });
-      html += '</tbody></table></div>';
-      document.getElementById('modalContent').innerHTML = html;
-      document.getElementById('modal').classList.remove('hidden');
+    function calcRow(input) {
+      var row = input.closest('tr');
+      var contracted = parseFloat(row.querySelector('td[data-contracted]').getAttribute('data-contracted')) || 0;
+      var daysWorked = parseFloat(row.querySelector('.bp-days').value) || 0;
+      var totalDays = parseInt(document.getElementById('bpTotalDays').value) || 28;
+      
+      var actual = (contracted * daysWorked) / totalDays;
+      row.querySelector('.bp-actual').textContent = actual.toFixed(2);
+      row.querySelector('.bp-actual').setAttribute('data-value', actual);
+
+      var add = (parseFloat(row.querySelector('.bp-bonus').value)||0) + (parseFloat(row.querySelector('.bp-leave').value)||0) + (parseFloat(row.querySelector('.bp-gratuity').value)||0);
+      var sub = (parseFloat(row.querySelector('.bp-penalty').value)||0) + (parseFloat(row.querySelector('.bp-advance').value)||0) + (parseFloat(row.querySelector('.bp-loan-rep').value)||0) + (parseFloat(row.querySelector('.bp-other').value)||0);
+      
+      var net = actual + add - sub;
+      row.querySelector('.bp-net').textContent = net.toFixed(2);
+      
+      updateTotalNet();
     }
 
+    function calcAllRows() {
+      var rows = document.querySelectorAll('#bpTableBody tr');
+      rows.forEach(function(row) {
+        var input = row.querySelector('.bp-days');
+        if (input) calcRow(input);
+      });
+    }
+
+    function updateTotalNet() {
+      var rows = document.querySelectorAll('#bpTableBody tr');
+      var total = 0;
+      rows.forEach(function(row) {
+        var net = parseFloat(row.querySelector('.bp-net').textContent) || 0;
+        total += net;
+      });
+      document.getElementById('totalNetPayable').textContent = fmt(total);
+    }
+
+    async function saveBulkPayroll() {
+      if (!confirm('Save payroll records for all employees?')) return;
+      
+      var btn = event.target;
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      var month = parseInt(document.getElementById('bpMonth').value);
+      var year = parseInt(document.getElementById('bpYear').value);
+      var totalDays = parseInt(document.getElementById('bpTotalDays').value) || 28;
+      
+      var rows = document.querySelectorAll('#bpTableBody tr');
+      var promises = [];
+
+      rows.forEach(function(row) {
+        var empId = row.getAttribute('data-emp-id');
+        var emp = employees.find(function(e) { return e.id === empId; });
+        if (!emp) return;
+
+        var daysWorked = parseFloat(row.querySelector('.bp-days').value) || 0;
+        var bonuses = parseFloat(row.querySelector('.bp-bonus').value) || 0;
+        var leavePay = parseFloat(row.querySelector('.bp-leave').value) || 0;
+        var gratuity = parseFloat(row.querySelector('.bp-gratuity').value) || 0;
+        var penalties = parseFloat(row.querySelector('.bp-penalty').value) || 0;
+        var advanceSalary = parseFloat(row.querySelector('.bp-advance').value) || 0;
+        var loansRepaid = parseFloat(row.querySelector('.bp-loan-rep').value) || 0;
+        var loansAdvanced = parseFloat(row.querySelector('.bp-loan-giv').value) || 0;
+        var otherDeductions = parseFloat(row.querySelector('.bp-other').value) || 0;
+        
+        var actual = (emp.base_salary * daysWorked) / totalDays;
+        var net = actual + bonuses + leavePay + gratuity - penalties - advanceSalary - loansRepaid - otherDeductions;
+
+        // Save Payroll Record
+        promises.push(sb.from('payroll_records').upsert({
+          employee_id: empId, month, year, total_days: totalDays, days_worked: daysWorked,
+          base_salary: emp.base_salary, actual_salary: actual, net_payable: net,
+          bonuses, leave_pay: leavePay, gratuity, penalties, advance_salary: advanceSalary,
+          loans_repaid: loansRepaid, other_deductions: otherDeductions
+        }, { onConflict: 'employee_id,month,year' }));
+
+        // Handle Loans
+        if (loansAdvanced > 0 || loansRepaid > 0) {
+          var curBal = emp.loan_balance || 0;
+          var newBal = curBal + loansAdvanced - loansRepaid;
+          
+          if (loansAdvanced > 0) {
+            promises.push(sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: 'Bulk entry', balance_after: newBal }));
+          }
+          if (loansRepaid > 0) {
+            promises.push(sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: loansRepaid, description: 'Bulk repayment', balance_after: newBal }));
+          }
+          promises.push(sb.from('employees').update({ loan_balance: newBal }).eq('id', empId));
+        }
+      });
+
+      try {
+        await Promise.all(promises);
+        alert('Successfully saved payroll for ' + rows.length + ' employees!');
+        loadData();
+      } catch (err) {
+        alert('Error saving: ' + err.message);
+      } finally {
+        btn.textContent = '💾 Save All Records';
+        btn.disabled = false;
+      }
+    }
+
+    // ─── SINGLE ENTRY (EXISTING) ─────────────────────────────────────────────
     function renderPayroll(container) {
       var today = new Date();
       var empOptions = '';
       employees.filter(function(e) { return e.status === 'active'; }).forEach(function(e) { empOptions += '<option value="' + e.id + '" data-salary="' + e.base_salary + '">' + e.name + ' (' + fmt(e.base_salary) + ')</option>'; });
       var monthDefault = today.getMonth() + 1;
       var yearDefault = today.getFullYear();
-      var daysInMonth = getDaysInMonth(monthDefault, yearDefault);
+      var daysInMonth = new Date(yearDefault, monthDefault, 0).getDate();
 
-      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Payroll Entry</h1><p class="text-gray-500">Process monthly payroll in AED</p></div>' +
+      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Single Payroll Entry</h1><p class="text-gray-500">Process monthly payroll for one employee</p></div>' +
         '<div class="card p-8"><form onsubmit="submitPayroll(event)">' +
         '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Employee *</label><select id="employeeSelect" required onchange="updateSalaryCalc()" class="input-field">' + (empOptions || '<option>No active employees</option>') + '</select></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month *</label><select id="payMonth" name="month" required onchange="autoUpdateDays()" class="input-field"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4" ' + (monthDefault===4?'selected':'') + '>April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month *</label><select id="payMonth" name="month" required onchange="autoUpdateDays()" class="input-field"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4" ' + (monthDefault===4?'selected':'') + '>Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year *</label><input id="payYear" type="number" name="year" value="' + yearDefault + '" required onchange="autoUpdateDays()" class="input-field"></div>' +
         '</div>' +
         '<div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl mb-8 border border-blue-100">' +
@@ -311,23 +509,19 @@
           '</div>' +
           '<div class="mt-4"><label class="block text-sm font-medium text-gray-700 mb-2">Actual Salary (Auto)</label><input type="number" id="actualSalary" readonly class="input-field bg-gray-100 font-bold text-blue-700 text-lg"></div>' +
         '</div>' +
-        '<h3 class="font-bold text-gray-900 mb-4">💵 Additions (AED)</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Bonuses</label><input type="number" name="bonuses" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="bonusesDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Leave Pay</label><input type="number" name="leavePay" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="leavePayDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Gratuity</label><input type="number" name="gratuity" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="gratuityDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Earnings</label><input type="number" name="otherEarnings" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="otherEarningsDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-        '</div>' +
-        '<h3 class="font-bold text-gray-900 mb-4">➖ Deductions (AED)</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Penalties</label><input type="number" name="penalties" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="penaltiesDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Repayment</label><input type="number" name="loansRepaid" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="loansRepaidDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Advance Salary</label><input type="number" name="advanceSalary" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="advanceSalaryDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Deductions</label><input type="number" name="otherDeductions" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="otherDeductionsDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
-        '</div>' +
-        '<h3 class="font-bold text-gray-900 mb-4">💳 Loan Advance (AED)</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount</label><input type="number" name="loansAdvanced" step="0.01" value="0" class="input-field"><input type="text" name="loansAdvancedDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Bonuses</label><input type="number" name="bonuses" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Leave Pay</label><input type="number" name="leavePay" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Gratuity</label><input type="number" name="gratuity" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Earnings</label><input type="number" name="otherEarnings" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Penalties</label><input type="number" name="penalties" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Repayment</label><input type="number" name="loansRepaid" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Advance Salary</label><input type="number" name="advanceSalary" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Deductions</label><input type="number" name="otherDeductions" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount (New)</label><input type="number" name="loansAdvanced" step="0.01" value="0" class="input-field"></div>' +
         '</div>' +
         '<div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl mb-8 border border-green-100">' +
-          '<p class="text-lg font-bold text-gray-900">Net Payable: <span class="text-3xl text-green-600">' + fmt(0) + ' <span id="netPayableDisplay">0.00</span></span></p>' +
+          '<p class="text-lg font-bold text-gray-900">Net Payable: <span class="text-3xl text-green-600"><span id="netPayableDisplay">0.00</span></span></p>' +
         '</div>' +
         '<div class="flex gap-3"><button type="submit" class="btn-primary flex-1 py-3 text-base">Save Payroll</button><button type="button" onclick="showPage(\'dashboard\')" class="btn-secondary flex-1 py-3 text-base">Cancel</button></div></form></div>';
       container.innerHTML = html;
@@ -337,6 +531,17 @@
       var select = document.getElementById('employeeSelect');
       var option = select.options[select.selectedIndex];
       document.getElementById('contractedSalary').value = option.getAttribute('data-salary') || 0;
+      calcActualSalary();
+    }
+
+    function autoUpdateDays() {
+      var month = parseInt(document.getElementById('payMonth')?.value || 1);
+      var year = parseInt(document.getElementById('payYear')?.value || new Date().getFullYear());
+      var totalDays = new Date(year, month, 0).getDate();
+      var totalDaysInput = document.getElementById('totalDays');
+      var daysWorkedInput = document.getElementById('daysWorked');
+      if (totalDaysInput) totalDaysInput.value = totalDays;
+      if (daysWorkedInput && daysWorkedInput.value > totalDays) daysWorkedInput.value = totalDays;
       calcActualSalary();
     }
 
@@ -377,53 +582,23 @@
       await sb.from('payroll_records').upsert({
         employee_id: empId, month, year, total_days: totalDays, days_worked: daysWorked,
         base_salary: contracted, actual_salary: actual, net_payable: net,
-        bonuses: parseFloat(fd.get('bonuses')), bonuses_desc: fd.get('bonusesDesc'),
-        penalties: parseFloat(fd.get('penalties')), penalties_desc: fd.get('penaltiesDesc'),
-        leave_pay: parseFloat(fd.get('leavePay')), leave_pay_desc: fd.get('leavePayDesc'),
-        gratuity: parseFloat(fd.get('gratuity')), gratuity_desc: fd.get('gratuityDesc'),
-        other_earnings: parseFloat(fd.get('otherEarnings')), other_earnings_desc: fd.get('otherEarningsDesc'),
-        loans_repaid: parseFloat(fd.get('loansRepaid')), loans_repaid_desc: fd.get('loansRepaidDesc'),
-        advance_salary: parseFloat(fd.get('advanceSalary')), advance_salary_desc: fd.get('advanceSalaryDesc'),
-        other_deductions: parseFloat(fd.get('otherDeductions')), other_deductions_desc: fd.get('otherDeductionsDesc')
+        bonuses: parseFloat(fd.get('bonuses')), penalties: parseFloat(fd.get('penalties')),
+        leave_pay: parseFloat(fd.get('leavePay')), gratuity: parseFloat(fd.get('gratuity')),
+        other_earnings: parseFloat(fd.get('otherEarnings')), loans_repaid: parseFloat(fd.get('loansRepaid')),
+        advance_salary: parseFloat(fd.get('advanceSalary')), other_deductions: parseFloat(fd.get('otherDeductions'))
       }, { onConflict: 'employee_id,month,year' });
 
       if (loansAdvanced > 0 || parseFloat(fd.get('loansRepaid')) > 0) {
         var curBal = emp.loan_balance || 0;
         var newBal = curBal + loansAdvanced - parseFloat(fd.get('loansRepaid'));
-        if (loansAdvanced > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: fd.get('loansAdvancedDesc'), balance_after: newBal });
-        if (parseFloat(fd.get('loansRepaid')) > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: parseFloat(fd.get('loansRepaid')), description: fd.get('loansRepaidDesc')||'Repayment', balance_after: newBal });
+        if (loansAdvanced > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: 'Manual entry', balance_after: newBal });
+        if (parseFloat(fd.get('loansRepaid')) > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: parseFloat(fd.get('loansRepaid')), description: 'Manual repayment', balance_after: newBal });
         await sb.from('employees').update({ loan_balance: newBal }).eq('id', empId);
       }
       alert('Saved! Net Payable: ' + fmt(net)); loadData();
     }
 
-    function renderBulkPayroll(container) {
-      var today = new Date();
-      container.innerHTML = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Bulk Payroll</h1><p class="text-gray-500">Process all active employees at once</p></div>' +
-        '<div class="card p-8"><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month</label><select id="bulkMonth" class="input-field"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year</label><input type="number" id="bulkYear" value="' + today.getFullYear() + '" class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Total Days</label><input type="number" id="bulkTotalDays" value="' + getDaysInMonth(today.getMonth()+1, today.getFullYear()) + '" class="input-field"></div>' +
-        '</div><button onclick="processBulkPayroll()" class="btn-primary w-full py-3">Process All Active Employees</button></div>';
-      document.getElementById('bulkMonth').value = today.getMonth() + 1;
-    }
-
-    async function processBulkPayroll() {
-      var month = parseInt(document.getElementById('bulkMonth').value);
-      var year = parseInt(document.getElementById('bulkYear').value);
-      var totalDays = parseInt(document.getElementById('bulkTotalDays').value) || 28;
-      var activeEmps = employees.filter(function(e) { return e.status === 'active'; });
-      for (var i = 0; i < activeEmps.length; i++) {
-        var emp = activeEmps[i];
-        await sb.from('payroll_records').upsert({
-          employee_id: emp.id, month, year, total_days: totalDays, days_worked: totalDays,
-          base_salary: emp.base_salary, actual_salary: emp.base_salary, net_payable: emp.base_salary,
-          bonuses: 0, penalties: 0, leave_pay: 0, gratuity: 0, other_earnings: 0, loans_repaid: 0, advance_salary: 0, other_deductions: 0
-        }, { onConflict: 'employee_id,month,year' });
-      }
-      alert('Processed ' + activeEmps.length + ' employees'); loadData();
-    }
-
+    // ─── LOANS ───────────────────────────────────────────────────────────────
     function renderLoans(container) {
       var totalOut = 0, withLoans = 0;
       employees.forEach(function(e) { totalOut += parseFloat(e.loan_balance||0); if(e.loan_balance>0) withLoans++; });
@@ -443,13 +618,12 @@
       container.innerHTML = html;
     }
 
-    // ─── ENHANCED REPORTS PAGE ───────────────────────────────────────────────
+    // ─── REPORTS ─────────────────────────────────────────────────────────────
     function renderReports(container) {
       var months = ['All Months','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       var years = ['All Years'];
       var uniqueYears = payrollRecords.map(function(r){return r.year;}).filter(function(v,i,a){return a.indexOf(v)===i;}).sort().reverse();
       years = years.concat(uniqueYears);
-      
       var empOptions = '<option value="all">All Employees</option>';
       employees.forEach(function(e){ empOptions += '<option value="'+e.id+'">'+e.name+'</option>'; });
 
@@ -471,7 +645,6 @@
           '<div class="overflow-x-auto max-h-[500px]"><table class="w-full text-sm" id="reportTable"><thead class="bg-gray-50 sticky top-0" id="reportTableHead"></thead><tbody id="reportTableBody"></tbody></table></div>' +
           '<div id="reportEmpty" class="hidden text-center py-12 text-gray-500">No records match your filters</div>' +
         '</div>';
-      
       updateReportFilters();
     }
 
@@ -507,56 +680,40 @@
 
       if (reportFilters.tab === 'payroll') {
         title.textContent = 'Monthly Payroll Records (AED)';
-        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Month/Year</th><th class="text-left py-3 px-4 font-medium text-gray-700">Days</th><th class="text-left py-3 px-4 font-medium text-gray-700">Actual Salary</th><th class="text-left py-3 px-4 font-medium text-gray-700">Additions</th><th class="text-left py-3 px-4 font-medium text-gray-700">Deductions</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net Payable</th></tr>';
-        
-        var totalNet = 0, totalActual = 0;
+        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Month/Year</th><th class="text-left py-3 px-4 font-medium text-gray-700">Actual Salary</th><th class="text-left py-3 px-4 font-medium text-gray-700">Additions</th><th class="text-left py-3 px-4 font-medium text-gray-700">Deductions</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net Payable</th></tr>';
+        var totalNet = 0;
         var rows = filtered.map(function(r) {
           var emp = employees.find(function(e){return e.id===r.employee_id;});
           var add = (parseFloat(r.bonuses)||0)+(parseFloat(r.leave_pay)||0)+(parseFloat(r.gratuity)||0)+(parseFloat(r.other_earnings)||0);
           var sub = (parseFloat(r.penalties)||0)+(parseFloat(r.loans_repaid)||0)+(parseFloat(r.advance_salary)||0)+(parseFloat(r.other_deductions)||0);
           totalNet += parseFloat(r.net_payable||0);
-          totalActual += parseFloat(r.actual_salary||r.base_salary||0);
-          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+(emp?emp.name:'?')+'</td><td class="py-3 px-4">'+r.month+'/'+r.year+'</td><td class="py-3 px-4">'+(r.days_worked||28)+'/'+(r.total_days||28)+'</td><td class="py-3 px-4">'+fmt(r.actual_salary||r.base_salary)+'</td><td class="py-3 px-4 text-green-600">+'+fmt(add)+'</td><td class="py-3 px-4 text-red-600">-'+fmt(sub)+'</td><td class="py-3 px-4 font-bold">'+fmt(r.net_payable)+'</td></tr>';
+          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+(emp?emp.name:'?')+'</td><td class="py-3 px-4">'+r.month+'/'+r.year+'</td><td class="py-3 px-4">'+fmt(r.actual_salary||r.base_salary)+'</td><td class="py-3 px-4 text-green-600">+'+fmt(add)+'</td><td class="py-3 px-4 text-red-600">-'+fmt(sub)+'</td><td class="py-3 px-4 font-bold">'+fmt(r.net_payable)+'</td></tr>';
         }).join('');
-
-        summary.innerHTML = 
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Total Net Payable</p><p class="text-xl font-bold text-gray-900">'+fmt(totalNet)+'</p></div>' +
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Total Actual Salary</p><p class="text-xl font-bold text-gray-900">'+fmt(totalActual)+'</p></div>' +
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Records Shown</p><p class="text-xl font-bold text-gray-900">'+filtered.length+'</p></div>' +
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Avg Net per Employee</p><p class="text-xl font-bold text-gray-900">'+fmt(filtered.length? (totalNet/filtered.length) : 0)+'</p></div>';
-
+        summary.innerHTML = '<div class="metric-card p-4 col-span-4"><p class="text-xs text-gray-500">Total Net Payable</p><p class="text-xl font-bold text-gray-900">'+fmt(totalNet)+'</p></div>';
         body.innerHTML = rows;
         empty.classList.toggle('hidden', filtered.length > 0);
       } 
       else if (reportFilters.tab === 'loans') {
         title.textContent = 'Loan Summary (AED)';
-        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Current Balance</th><th class="text-left py-3 px-4 font-medium text-gray-700">Total Advanced</th><th class="text-left py-3 px-4 font-medium text-gray-700">Total Repaid</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net Position</th></tr>';
-        
-        var totalOut = 0, totalAdv = 0, totalRep = 0;
+        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Balance</th><th class="text-left py-3 px-4 font-medium text-gray-700">Advanced</th><th class="text-left py-3 px-4 font-medium text-gray-700">Repaid</th></tr>';
+        var totalOut = 0;
         var rows = employees.map(function(emp) {
           var empLoans = loanTransactions.filter(function(r){return r.employee_id===emp.id;});
           var adv = 0, rep = 0;
           empLoans.forEach(function(r){ if(r.type==='advanced') adv+=r.amount; else rep+=r.amount; });
           totalOut += parseFloat(emp.loan_balance||0);
-          totalAdv += adv; totalRep += rep;
-          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+emp.name+'</td><td class="py-3 px-4 '+(emp.loan_balance>0?'text-red-600 font-bold':'text-green-600')+'">'+fmt(emp.loan_balance||0)+'</td><td class="py-3 px-4 text-red-600">'+fmt(adv)+'</td><td class="py-3 px-4 text-green-600">'+fmt(rep)+'</td><td class="py-3 px-4 font-semibold">'+fmt(adv-rep)+'</td></tr>';
+          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+emp.name+'</td><td class="py-3 px-4 font-bold">'+fmt(emp.loan_balance||0)+'</td><td class="py-3 px-4 text-red-600">'+fmt(adv)+'</td><td class="py-3 px-4 text-green-600">'+fmt(rep)+'</td></tr>';
         }).join('');
-
-        summary.innerHTML = 
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Total Outstanding</p><p class="text-xl font-bold text-red-600">'+fmt(totalOut)+'</p></div>' +
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Total Advanced</p><p class="text-xl font-bold text-gray-900">'+fmt(totalAdv)+'</p></div>' +
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Total Repaid</p><p class="text-xl font-bold text-green-600">'+fmt(totalRep)+'</p></div>' +
-          '<div class="metric-card p-4"><p class="text-xs text-gray-500">Employees</p><p class="text-xl font-bold text-gray-900">'+employees.length+'</p></div>';
-
+        summary.innerHTML = '<div class="metric-card p-4 col-span-4"><p class="text-xs text-gray-500">Total Outstanding</p><p class="text-xl font-bold text-red-600">'+fmt(totalOut)+'</p></div>';
         body.innerHTML = rows;
         empty.classList.add('hidden');
       }
       else {
         title.textContent = 'Full Payroll History (AED)';
-        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Month/Year</th><th class="text-left py-3 px-4 font-medium text-gray-700">Base</th><th class="text-left py-3 px-4 font-medium text-gray-700">Bonuses</th><th class="text-left py-3 px-4 font-medium text-gray-700">Penalties</th><th class="text-left py-3 px-4 font-medium text-gray-700">Leave</th><th class="text-left py-3 px-4 font-medium text-gray-700">Gratuity</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net</th></tr>';
+        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Month</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net</th></tr>';
         var rows = filtered.map(function(r) {
           var emp = employees.find(function(e){return e.id===r.employee_id;});
-          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+(emp?emp.name:'?')+'</td><td class="py-3 px-4">'+r.month+'/'+r.year+'</td><td class="py-3 px-4">'+fmt(r.base_salary)+'</td><td class="py-3 px-4">'+fmt(r.bonuses||0)+'</td><td class="py-3 px-4 text-red-600">'+fmt(r.penalties||0)+'</td><td class="py-3 px-4">'+fmt(r.leave_pay||0)+'</td><td class="py-3 px-4">'+fmt(r.gratuity||0)+'</td><td class="py-3 px-4 font-bold">'+fmt(r.net_payable)+'</td></tr>';
+          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+(emp?emp.name:'?')+'</td><td class="py-3 px-4">'+r.month+'/'+r.year+'</td><td class="py-3 px-4 font-bold">'+fmt(r.net_payable)+'</td></tr>';
         }).join('');
         summary.innerHTML = '<div class="metric-card p-4 col-span-4"><p class="text-xs text-gray-500">Total Records</p><p class="text-xl font-bold text-gray-900">'+filtered.length+'</p></div>';
         body.innerHTML = rows;
@@ -565,47 +722,85 @@
     }
 
     function exportCurrentReport() {
-      if (reportFilters.tab === 'payroll') exportMonthlyReport();
-      else if (reportFilters.tab === 'loans') exportLoanReport();
-      else exportAllPayroll();
+      if (reportFilters.tab === 'payroll') {
+        var csv = 'Employee,Month,Year,Actual Salary,Additions,Deductions,Net Payable (AED)\n';
+        payrollRecords.forEach(function(r) {
+          var emp = employees.find(function(e){return e.id===r.employee_id;});
+          var add = (parseFloat(r.bonuses)||0)+(parseFloat(r.leave_pay)||0)+(parseFloat(r.gratuity)||0)+(parseFloat(r.other_earnings)||0);
+          var sub = (parseFloat(r.penalties)||0)+(parseFloat(r.loans_repaid)||0)+(parseFloat(r.advance_salary)||0)+(parseFloat(r.other_deductions)||0);
+          csv += (emp?emp.name:'?')+','+r.month+','+r.year+','+(r.actual_salary||r.base_salary)+','+add+','+sub+','+r.net_payable+'\n';
+        });
+        downloadCSV(csv, 'monthly-payroll-AED.csv');
+      } else if (reportFilters.tab === 'loans') {
+        var csv='Employee,Balance,Advanced,Repaid (AED)\n';
+        employees.forEach(function(emp){
+          var lo=loanTransactions.filter(function(r){return r.employee_id===emp.id;});
+          var a=0,p=0;lo.forEach(function(r){if(r.type==='advanced')a+=r.amount;else p+=r.amount;});
+          csv+=emp.name+','+(emp.loan_balance||0)+','+a+','+p+'\n';
+        });
+        downloadCSV(csv, 'loan-summary-AED.csv');
+      } else {
+        var csv='Employee,Month,Year,Net (AED)\n';
+        payrollRecords.forEach(function(r){
+          var e=employees.find(function(x){return x.id===r.employee_id;});
+          csv+=(e?e.name:'?')+','+r.month+','+r.year+','+r.net_payable+'\n';
+        });
+        downloadCSV(csv, 'full-history-AED.csv');
+      }
     }
 
-    function exportMonthlyReport() {
-      var csv = 'Employee,Month,Year,Days,Actual Salary,Additions,Deductions,Net Payable (AED)\n';
-      payrollRecords.forEach(function(r) {
-        var emp = employees.find(function(e){return e.id===r.employee_id;});
-        var add = (parseFloat(r.bonuses)||0)+(parseFloat(r.leave_pay)||0)+(parseFloat(r.gratuity)||0)+(parseFloat(r.other_earnings)||0);
-        var sub = (parseFloat(r.penalties)||0)+(parseFloat(r.loans_repaid)||0)+(parseFloat(r.advance_salary||0))+(parseFloat(r.other_deductions)||0);
-        csv += (emp?emp.name:'?')+','+r.month+','+r.year+','+(r.days_worked||28)+','+(r.actual_salary||r.base_salary)+','+add+','+sub+','+r.net_payable+'\n';
-      });
-      downloadCSV(csv, 'monthly-payroll-AED.csv');
-    }
-    function exportLoanReport() {
-      var csv='Employee,Current Balance,Total Advanced,Total Repaid,Net Position (AED)\n';
-      employees.forEach(function(emp){
-        var lo=loanTransactions.filter(function(r){return r.employee_id===emp.id;});
-        var a=0,p=0;lo.forEach(function(r){if(r.type==='advanced')a+=r.amount;else p+=r.amount;});
-        csv+=emp.name+','+(emp.loan_balance||0)+','+a+','+p+','+(a-p)+'\n';
-      });
-      downloadCSV(csv, 'loan-summary-AED.csv');
-    }
-    function exportAllPayroll() {
-      var csv='Employee,Month,Year,Base,Bonuses,Penalties,Leave,Gratuity,Net (AED)\n';
-      payrollRecords.forEach(function(r){
-        var e=employees.find(function(x){return x.id===r.employee_id;});
-        csv+=(e?e.name:'?')+','+r.month+','+r.year+','+r.base_salary+','+(r.bonuses||0)+','+(r.penalties||0)+','+(r.leave_pay||0)+','+(r.gratuity||0)+','+r.net_payable+'\n';
-      });
-      downloadCSV(csv, 'full-payroll-history-AED.csv');
-    }
-    function exportAllLoans() {
-      var csv='Date,Employee,Type,Amount,Description,Balance (AED)\n';
-      loanTransactions.forEach(function(r){
-        var e=employees.find(function(x){return x.id===r.employee_id;});
-        csv+=new Date(r.created_at).toLocaleDateString()+','+(e?e.name:'?')+','+r.type+','+r.amount+','+(r.description||'')+','+r.balance_after+'\n';
-      });
-      downloadCSV(csv, 'all-loan-transactions-AED.csv');
-    }
     function downloadCSV(csv, fn) { var b=new Blob([csv],{type:'text/csv'}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=fn; a.click(); }
+    
+    // Other Helpers
+    function getDaysInMonth(month, year) { return new Date(year, month, 0).getDate(); }
+    function showImportExcelModal() {
+      document.getElementById('modalContent').innerHTML = '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Import from Excel</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div><div class="mb-6"><p class="text-gray-600 mb-4">Upload your Excel file</p><input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="input-field mb-4"></div><div class="flex gap-3"><button onclick="processExcelImport()" class="btn-primary flex-1">Import</button><button onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div>';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+    function processExcelImport() {
+      var file = document.getElementById('excelFile').files[0];
+      if (!file) return alert('Select a file');
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var data = new Uint8Array(e.target.result);
+        var workbook = XLSX.read(data, {type: 'array'});
+        var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+        var count = 0, promises = [];
+        jsonData.forEach(function(row) {
+          var name = row['Description'] || row['description'] || row['Name'] || row['name'];
+          var pos = row['Position'] || row['position'] || '';
+          var sal = row['Contracted Salary'] || row['salary'] || 0;
+          if (name && sal) { promises.push(sb.from('employees').insert({ name: name, role: pos, base_salary: parseFloat(sal), loan_balance: 0, status: 'active' })); count++; }
+        });
+        Promise.all(promises).then(function() { alert('Imported ' + count + ' employees!'); closeModal(); loadData(); }).catch(function(err) { alert('Error: ' + err.message); });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    function showAddEmployeeModal() {
+      document.getElementById('modalContent').innerHTML = '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Add Employee</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div><form onsubmit="addEmployee(event)"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div><label class="block text-sm font-medium text-gray-700 mb-2">Name *</label><input name="name" required class="input-field"></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Position</label><input name="role" class="input-field"></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Salary (AED) *</label><input name="baseSalary" type="number" step="0.01" required class="input-field"></div></div><div class="flex gap-3"><button type="submit" class="btn-primary flex-1">Save</button><button type="button" onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div></form>';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+    async function addEmployee(e) {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+      await sb.from('employees').insert({ name: fd.get('name'), role: fd.get('role'), base_salary: parseFloat(fd.get('baseSalary')), loan_balance: 0, status: 'active' });
+      closeModal(); loadData();
+    }
+    async function deleteEmployee(id) {
+      if (!confirm('Delete this employee?')) return;
+      await sb.from('employees').delete().eq('id', id);
+      loadData();
+    }
+    function viewEmployeeHistory(empId) {
+      var emp = employees.find(function(e) { return e.id === empId; });
+      var html = '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">History: ' + emp.name + '</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div><h3 class="font-semibold mb-3">Payroll</h3><table class="w-full text-sm mb-6"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-3">Month</th><th class="text-left py-2 px-3">Days</th><th class="text-left py-2 px-3">Net</th></tr></thead><tbody>';
+      payrollRecords.filter(function(r){return r.employee_id===empId;}).forEach(function(r){ html+='<tr class="border-b"><td class="py-2 px-3">'+r.month+'/'+r.year+'</td><td class="py-2 px-3">'+(r.days_worked||28)+'</td><td class="py-2 px-3 font-bold">'+fmt(r.net_payable)+'</td></tr>'; });
+      html += '</tbody></table><h3 class="font-semibold mb-3">Loans</h3><table class="w-full text-sm"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-3">Date</th><th class="text-left py-2 px-3">Type</th><th class="text-left py-2 px-3">Amount</th></tr></thead><tbody>';
+      loanTransactions.filter(function(r){return r.employee_id===empId;}).forEach(function(r){ html+='<tr class="border-b"><td class="py-2 px-3">'+new Date(r.created_at).toLocaleDateString()+'</td><td class="py-2 px-3">'+r.type+'</td><td class="py-2 px-3">'+fmt(r.amount)+'</td></tr>'; });
+      html += '</tbody></table>';
+      document.getElementById('modalContent').innerHTML = html;
+      document.getElementById('modal').classList.remove('hidden');
+    }
     function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
     (function() { sb.auth.getSession().then(function(r){ if(r.data&&r.data.session) initApp(); }); })();
