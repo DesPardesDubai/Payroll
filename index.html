@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DesPardes Dubai - Payroll Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .tab-active { background-color: #2563eb; color: white; }
+    .tab-inactive { background-color: white; color: #374151; }
+    .tab-inactive:hover { background-color: #f3f4f6; }
+    .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+      <h1 class="text-2xl font-bold mb-2 text-center">🍽️ DesPardes Payroll</h1>
+      <p class="text-gray-500 text-center mb-4 text-sm">Restaurant Staff Payroll Management System</p>
+      <form id="loginForm" class="space-y-3">
+        <input type="email" id="authEmail" placeholder="Email" required class="w-full p-3 border rounded">
+        <input type="password" id="authPass" placeholder="Password" required class="w-full p-3 border rounded">
+        <button type="submit" id="authBtn" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 font-medium">Sign In / Create Account</button>
+        <p id="authMsg" class="text-sm text-center hidden"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="appScreen" class="hidden p-4 md:p-8">
+    <header class="max-w-6xl mx-auto flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+      <h1 class="text-2xl font-bold text-gray-800">🍽️ DesPardes Payroll Cloud</h1>
+      <div class="flex items-center gap-2">
+        <nav id="nav" class="flex bg-white rounded-lg shadow-sm p-1 gap-1"></nav>
+        <button onclick="logout()" class="text-gray-500 hover:text-red-500 text-sm px-2">Logout</button>
+      </div>
+    </header>
+    <main id="content" class="max-w-6xl mx-auto bg-white rounded-xl shadow p-4 md:p-6 min-h-[60vh]"></main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://lqolicwuailbemonuaor.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxb2xpY3d1YWlsYmVtb251YW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDEzMjIsImV4cCI6MjA5MTMxNzMyMn0.WdEHwSJXM1hTXrlM5Rebs5PnyUDmO0DYHv05D-BgIWo';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let employees = [];
+    let payrollRecords = [];
+    const tabs = ['dashboard', 'employees', 'payroll'];
+
+    // ─── AUTH ───────────────────────────────────────────────────────────────
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('authBtn');
+      const msg = document.getElementById('authMsg');
+      btn.textContent = 'Authenticating...'; btn.disabled = true;
+      msg.classList.add('hidden');
+
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPass').value;
+
+      const { data: user, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) {
+        if (error.message.includes('Invalid login')) {
+          const { error: signUpErr } = await supabase.auth.signUp({ email, password: pass });
+          if (signUpErr) msg.textContent = signUpErr.message;
+          else msg.textContent = 'Account created! Please sign in.';
+        } else msg.textContent = error.message;
+        msg.className = 'text-sm text-center text-red-500';
+        msg.classList.remove('hidden');
+        btn.textContent = 'Sign In / Create Account'; btn.disabled = false;
+        return;
+      }
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('appScreen').classList.remove('hidden');
+      loadAllData();
+    });
+
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+
+    // ─── DATA SYNC ───────────────────────────────────────────────────────────
+    async function loadAllData() {
+      showLoader();
+      const { data: empData, error: eErr } = await supabase.from('employees').select('*').order('name');
+      const { data: payData, error: pErr } = await supabase.from('payroll_records').select('*, employees(name)');
+      if (eErr) alert('DB Error: ' + eErr.message);
+      if (pErr) alert('DB Error: ' + pErr.message);
+      employees = empData || [];
+      payrollRecords = payData || [];
+      hideLoader();
+      renderNav('dashboard');
+    }
+
+    function showLoader() { document.getElementById('content').innerHTML = '<div class="flex justify-center p-8"><span class="loader"></span></div>'; }
+    function hideLoader() {}
+
+    function renderNav(active) {
+      document.getElementById('nav').innerHTML = tabs.map(t => `
+        <button onclick="switchTab('${t}')" class="px-3 py-2 rounded-md text-sm capitalize font-medium transition ${active === t ? 'tab-active' : 'tab-inactive'}">${t}</button>
+      `).join('');
+      renderContent(active);
+    }
+    function switchTab(t) { renderNav(t); }
+
+    function renderContent(tab) {
+      const el = document.getElementById('content');
+      if (tab === 'dashboard') renderDashboard(el);
+      else if (tab === 'employees') renderEmployees(el);
+      else if (tab === 'payroll') renderPayroll(el);
+    }
+
+    // ─── DASHBOARD ───────────────────────────────────────────────────────────
+    function renderDashboard(el) {
+      const totalPaid = payrollRecords.reduce((s, r) => s + (r.net_payable || 0), 0);
+      const outstandingLoans = employees.reduce((s, e) => s + (e.loan_balance || 0), 0);
+      el.innerHTML = `
+        <h2 class="text-xl font-semibold mb-4">Payroll Overview</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-blue-50 p-4 rounded-lg"><p class="text-gray-600">Active Employees</p><p class="text-2xl font-bold">${employees.length}</p></div>
+          <div class="bg-green-50 p-4 rounded-lg"><p class="text-gray-600">Total Net Paid (All Time)</p><p class="text-2xl font-bold">$${totalPaid.toFixed(2)}</p></div>
+          <div class="bg-red-50 p-4 rounded-lg"><p class="text-gray-600">Outstanding Loans</p><p class="text-2xl font-bold">$${outstandingLoans.toFixed(2)}</p></div>
+        </div>
+        <p class="text-gray-500 text-sm">✅ Data syncs automatically across all devices. Secure cloud storage powered by Supabase.</p>
+      `;
+    }
+
+    // ─── EMPLOYEES ───────────────────────────────────────────────────────────
+    function renderEmployees(el) {
+      const rows = employees.map(e => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-3">${e.name}</td>
+          <td class="p-3">${e.role || '-'}</td>
+          <td class="p-3">$${e.base_salary.toFixed(2)}</td>
+          <td class="p-3">${e.loan_balance > 0 ? '<span class="text-red-500 font-bold">$'+e.loan_balance.toFixed(2)+'</span>' : '<span class="text-green-600">$0.00</span>'}</td>
+          <td class="p-3"><button onclick="deleteEmployee('${e.id}')" class="text-red-500 hover:underline text-sm">Delete</button></td>
+        </tr>
+      `).join('');
+
+      el.innerHTML = `
+        <h2 class="text-xl font-semibold mb-4">Employee Management</h2>
+        <form onsubmit="addEmployee(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-6 bg-gray-50 p-3 rounded-lg">
+          <input required name="name" placeholder="Full Name" class="border p-2 rounded">
+          <input name="role" placeholder="Role (e.g., Chef, Server)" class="border p-2 rounded">
+          <input required name="baseSalary" type="number" step="0.01" min="0" placeholder="Base Salary" class="border p-2 rounded">
+          <button type="submit" id="addEmpBtn" class="bg-green-600 text-white p-2 rounded hover:bg-green-700">Add Employee</button>
+        </form>
+        <div class="overflow-x-auto"><table class="w-full text-left"><thead class="bg-gray-100"><tr><th class="p-3">Name</th><th class="p-3">Role</th><th class="p-3">Base Salary</th><th class="p-3">Loan Balance</th><th class="p-3">Action</th></tr></thead><tbody>${rows || '<tr><td colspan="5" class="p-4 text-center text-gray-400">No employees added yet.</td></tr>'}</tbody></table></div>
+      `;
+    }
+
+    async function addEmployee(e) {
+      e.preventDefault();
+      const btn = document.getElementById('addEmpBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      const fd = new FormData(e.target);
+      const { error } = await supabase.from('employees').insert({
+        name: fd.get('name'), role: fd.get('role'), base_salary: parseFloat(fd.get('baseSalary')), loan_balance: 0
+      });
+      btn.disabled = false; btn.textContent = 'Add Employee';
+      if (error) return alert(error.message);
+      loadAllData();
+    }
+
+    async function deleteEmployee(id) {
+      if (!confirm('Delete employee? Past payroll records will remain.')) return;
+      const { error } = await supabase.from('employees').delete().eq('id', id);
+      if (error) return alert(error.message);
+      loadAllData();
+    }
+
+    // ─── PAYROLL ─────────────────────────────────────────────────────────────
+    function renderPayroll(el) {
+      const today = new Date();
+      const empOpts = employees.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+      const rows = [...payrollRecords].sort((a,b) => `${b.year}-${String(b.month).padStart(2,'0')}`.localeCompare(`${a.year}-${String(a.month).padStart(2,'0')}`)).map(r => {
+        const emp = employees.find(e => e.id === r.employee_id);
+        return `<tr class="border-b hover:bg-gray-50 text-sm">
+          <td class="p-2">${String(r.month).padStart(2,'0')}/${r.year}</td>
+          <td class="p-2">${emp?.name || 'Unknown'}</td>
+          <td class="p-2">$${r.base_salary.toFixed(2)}</td>
+          <td class="p-2">$${r.bonuses.toFixed(2)}</td>
+          <td class="p-2 text-red-500">-$${r.penalties.toFixed(2)}</td>
+          <td class="p-2">$${r.leave_pay.toFixed(2)}</td>
+          <td class="p-2">$${r.gratuity.toFixed(2)}</td>
+          <td class="p-2 text-orange-500">+$${r.loans_advanced.toFixed(2)}</td>
+          <td class="p-2 text-green-600">-$${r.loans_repaid.toFixed(2)}</td>
+          <td class="p-2 font-bold">$${r.net_payable.toFixed(2)}</td>
+          <td class="p-2"><button onclick="deletePayroll('${r.id}')" class="text-red-500 hover:underline">✕</button></td>
+        </tr>`;
+      }).join('');
+
+      el.innerHTML = `
+        <h2 class="text-xl font-semibold mb-4">Monthly Payroll Entry</h2>
+        <form onsubmit="submitPayroll(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6 bg-gray-50 p-4 rounded-lg">
+          <select required name="empId" class="border p-2 rounded"><option value="">Select Employee</option>${empOpts}</select>
+          <input required name="month" type="number" min="1" max="12" value="${today.getMonth()+1}" class="border p-2 rounded" placeholder="Month (1-12)">
+          <input required name="year" type="number" value="${today.getFullYear()}" class="border p-2 rounded" placeholder="Year">
+          <input name="bonuses" type="number" step="0.01" min="0" value="0" class="border p-2 rounded" placeholder="Bonuses">
+          <input name="penalties" type="number" step="0.01" min="0" value="0" class="border p-2 rounded" placeholder="Penalties">
+          <input name="leavePay" type="number" step="0.01" min="0" value="0" class="border p-2 rounded" placeholder="Leave Pay">
+          <input name="gratuity" type="number" step="0.01" min="0" value="0" class="border p-2 rounded" placeholder="Gratuity">
+          <input name="loanAdv" type="number" step="0.01" min="0" value="0" class="border p-2 rounded" placeholder="Loans Given">
+          <input name="loanRep" type="number" step="0.01" min="0" value="0" class="border p-2 rounded" placeholder="Loans Repaid">
+          <button type="submit" id="savePayBtn" class="col-span-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mt-2">Save Record & Calculate</button>
+        </form>
+        <div class="overflow-x-auto"><table class="w-full text-left"><thead class="bg-gray-100"><tr><th class="p-2">M/Y</th><th class="p-2">Name</th><th class="p-2">Base</th><th class="p-2">Bonus</th><th class="p-2">Penalty</th><th class="p-2">Leave</th><th class="p-2">Gratuity</th><th class="p-2">Loan+</th><th class="p-2">Loan-</th><th class="p-2">Net</th><th class="p-2"></th></tr></thead><tbody>${rows || '<tr><td colspan="11" class="p-4 text-center text-gray-400">No payroll records yet.</td></tr>'}</tbody></table></div>
+      `;
+    }
+
+    async function submitPayroll(e) {
+      e.preventDefault();
+      const btn = document.getElementById('savePayBtn');
+      btn.disabled = true; btn.textContent = 'Saving to Cloud...';
+      const fd = new FormData(e.target);
+      const empId = fd.get('empId');
+      const month = parseInt(fd.get('month'));
+      const year = parseInt(fd.get('year'));
+      const emp = employees.find(e => e.id === empId);
+
+      const base = emp.base_salary;
+      const bonuses = parseFloat(fd.get('bonuses')) || 0;
+      const penalties = parseFloat(fd.get('penalties')) || 0;
+      const leavePay = parseFloat(fd.get('leavePay')) || 0;
+      const gratuity = parseFloat(fd.get('gratuity')) || 0;
+      const loanAdv = parseFloat(fd.get('loanAdv')) || 0;
+      const loanRep = parseFloat(fd.get('loanRep')) || 0;
+      const netPayable = base + bonuses + leavePay + gratuity - penalties - loanRep;
+
+      const { error } = await supabase.from('payroll_records').upsert({
+        employee_id: empId, month, year, base_salary: base, bonuses, penalties,
+        leave_pay: leavePay, gratuity, loans_advanced: loanAdv, loans_repaid: loanRep, net_payable: netPayable
+      }, { onConflict: 'employee_id,month,year' });
+
+      if (error) { btn.disabled = false; btn.textContent = 'Save Record & Calculate'; return alert(error.message); }
+
+      const newBalance = emp.loan_balance + loanAdv - loanRep;
+      await supabase.from('employees').update({ loan_balance: newBalance }).eq('id', empId);
+
+      btn.disabled = false; btn.textContent = 'Save Record & Calculate';
+      loadAllData();
+      alert(`✅ Saved! Net Payable: $${netPayable.toFixed(2)}`);
+    }
+
+    async function deletePayroll(id) {
+      if (!confirm('Delete this payroll record?')) return;
+      const { error } = await supabase.from('payroll_records').delete().eq('id', id);
+      if (error) return alert(error.message);
+      loadAllData();
+    }
+
+    // Init
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
+        loadAllData();
+      }
+    })();
+  </script>
+</body>
+</html>
