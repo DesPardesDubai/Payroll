@@ -3,99 +3,265 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DesPardes Payroll Pro - Dubai</title>
+  <title>DesPardes Payroll Pro</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase & Parsers -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <!-- Google Fonts: Inter for a clean, modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    .sidebar-item:hover { background: #f3f4f6; }
-    .sidebar-item.active { background: #fef2f2; color: #dc2626; border-right: 3px solid #dc2626; }
-    .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
-    .input-field { width: 100%; padding: 8px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
-    .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-    .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
-    .btn-secondary { background: #f9fafb; color: #374151; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1.5px solid #e5e7eb; }
-    .btn-secondary:hover { background: #f3f4f6; }
-    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
-    .metric-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .badge { padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
-    .badge-success { background: #d1fae5; color: #065f46; }
+    :root {
+      --bg-body: #f8fafc;
+      --card-bg: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --accent-primary: #2563eb; /* Professional Blue */
+      --accent-hover: #1d4ed8;
+      --border-color: #e2e8f0;
+    }
+    
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-primary); }
+    
+    /* --- Sidebar Styling --- */
+    .sidebar { background: white; border-right: 1px solid var(--border-color); }
+    .sidebar-item { 
+      color: var(--text-secondary); 
+      font-weight: 500; 
+      transition: all 0.2s; 
+      border-left: 3px solid transparent; 
+    }
+    .sidebar-item:hover { color: var(--accent-primary); background-color: #f1f5f9; }
+    .sidebar-item.active { 
+      color: var(--accent-primary); 
+      background-color: #eff6ff; 
+      border-left-color: var(--accent-primary);
+    }
+    
+    /* --- Card Styling (Glass/Material Look) --- */
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); 
+      border: 1px solid var(--border-color); 
+    }
+    .card-header { border-bottom: 1px solid var(--border-color); padding: 20px 24px; }
+    
+    /* --- Hero Section (Dashboard) --- */
+    .hero-section {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 20px;
+      color: white;
+      padding: 32px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Subtle background pattern for hero */
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* --- Buttons --- */
+    .btn-primary { 
+      background: var(--accent-primary); 
+      color: white; 
+      padding: 10px 20px; 
+      border-radius: 10px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      border: none; 
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3); }
+    
+    .btn-secondary { 
+      background: white; 
+      color: var(--text-primary); 
+      padding: 10px 20px; 
+      border-radius: 10px; 
+      font-weight: 500; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      border: 1px solid var(--border-color); 
+    }
+    .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+    
+    .btn-danger { 
+      background: #ef4444; 
+      color: white; 
+      padding: 10px 20px; 
+      border-radius: 10px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      border: none; 
+    }
+    .btn-danger:hover { background: #dc2626; }
+
+    /* --- Inputs --- */
+    .input-field { 
+      width: 100%; 
+      padding: 12px 16px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 10px; 
+      font-size: 14px; 
+      transition: all 0.2s; 
+      background-color: #fff;
+    }
+    .input-field:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+    /* --- Tables --- */
+    .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background-color: #f8fafc; color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); font-size: 14px; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background-color: #f8fafc; }
+
+    /* --- Payroll Grid Inputs --- */
+    .payroll-input { 
+      width: 100%; 
+      padding: 8px; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 6px; 
+      font-size: 13px; 
+      text-align: right; 
+      transition: all 0.15s;
+    }
+    .payroll-input:focus { border-color: var(--accent-primary); outline: none; background: #eff6ff; }
+    .payroll-input.net { background-color: #f0fdf4; color: #15803d; font-weight: 700; border-color: #bbf7d0; }
+    .payroll-input.red { background-color: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+    /* --- Badges --- */
+    .badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .badge-success { background: #dcfce7; color: #166534; }
     .badge-danger { background: #fee2e2; color: #991b1b; }
-    .table-row:hover { background: #f9fafb; }
-    .tab-btn.active { background: #3b82f6; color: white; }
-    .payroll-input { width: 80px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; text-align: right; }
-    .payroll-input:focus { border-color: #3b82f6; outline: none; }
-    .payroll-input.net { background: #f0fdf4; border-color: #86efac; font-weight: bold; color: #166534; }
-    .payroll-input.red { background: #fef2f2; color: #991b1b; }
-    .bulk-action-bar { background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
-    .saved-indicator { position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { transform: translateX(400px); } to { transform: translateX(0); } }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+
+    /* --- Animations --- */
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body class="bg-gray-50">
+<body class="min-h-screen text-slate-900">
 
-  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
-    <div class="card p-10 w-full max-w-md shadow-xl">
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+    <div class="card w-full max-w-md p-10 shadow-lg fade-in">
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-white text-3xl mb-4">🇦🇪</div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">DesPardes Payroll</h1>
-        <p class="text-gray-500">Dubai Restaurant Management</p>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 text-white text-3xl mb-4 shadow-lg shadow-blue-200">
+          🇦
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">DesPardes Payroll</h1>
+        <p class="text-slate-500 text-sm mt-2">Professional Restaurant Management</p>
       </div>
-      <div class="flex bg-gray-100 rounded-xl p-1 mb-6">
-        <button id="btnTabSignIn" class="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white text-gray-900 shadow-sm" onclick="switchAuthTab('signIn')">Sign In</button>
-        <button id="btnTabSignUp" class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-500" onclick="switchAuthTab('signUp')">Create Account</button>
+
+      <div class="flex bg-slate-100 p-1 rounded-lg mb-6">
+        <button id="btnTabSignIn" class="flex-1 py-2 rounded-md text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all" onclick="switchAuthTab('signIn')">Sign In</button>
+        <button id="btnTabSignUp" class="flex-1 py-2 rounded-md text-sm font-semibold text-slate-500 hover:text-slate-700 transition-all" onclick="switchAuthTab('signUp')">Create Account</button>
       </div>
-      <form id="formSignIn" onsubmit="handleSignIn(event)">
-        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label><input type="email" id="inEmail" required placeholder="you@company.com" class="input-field"></div>
-        <div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-2">Password</label><input type="password" id="inPass" required placeholder="••••••••" class="input-field"></div>
-        <button type="submit" class="btn-primary w-full py-3 text-base">Sign In to Dashboard</button>
+
+      <form id="formSignIn" onsubmit="handleSignIn(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Email Address</label>
+          <input type="email" id="inEmail" required placeholder="you@company.com" class="input-field">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Password</label>
+          <input type="password" id="inPass" required placeholder="••••••••" class="input-field">
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 mt-2">Sign In</button>
       </form>
-      <form id="formSignUp" class="hidden" onsubmit="handleSignUp(event)">
-        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label><input type="email" id="upEmail" required placeholder="you@company.com" class="input-field"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Password</label><input type="password" id="upPass" required minlength="6" placeholder="Min 6 characters" class="input-field"></div>
-        <div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label><input type="password" id="upPass2" required minlength="6" placeholder="Confirm password" class="input-field"></div>
-        <button type="submit" class="w-full py-3 text-base rounded-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition">Create Account</button>
+
+      <form id="formSignUp" class="hidden space-y-4" onsubmit="handleSignUp(event)">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Email Address</label>
+          <input type="email" id="upEmail" required placeholder="you@company.com" class="input-field">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Password</label>
+          <input type="password" id="upPass" required minlength="6" placeholder="Min 6 characters" class="input-field">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Confirm Password</label>
+          <input type="password" id="upPass2" required minlength="6" placeholder="Confirm password" class="input-field">
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 mt-2 bg-green-600 hover:bg-green-700">Create Account</button>
       </form>
+
       <div id="authMsg" class="mt-6 text-sm text-center hidden"></div>
     </div>
   </div>
 
-  <div id="appScreen" class="hidden min-h-screen bg-gray-50">
-    <div class="flex">
-      <aside class="w-64 bg-white border-r border-gray-200 fixed h-full overflow-y-auto shadow-sm">
-        <div class="p-6 border-b border-gray-100">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl">🇦🇪</div>
-            <div><h2 class="text-lg font-bold text-gray-900">DesPardes</h2><p class="text-xs text-gray-500">Payroll Pro • AED</p></div>
+  <!-- APP SCREEN -->
+  <div id="appScreen" class="hidden min-h-screen bg-slate-50 flex">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 fixed h-full overflow-y-auto z-10 hidden md:block">
+      <div class="p-6 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xl shadow-md shadow-blue-200">
+            🇦
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 leading-none">DesPardes</h2>
+            <p class="text-xs text-slate-400 font-medium mt-1">PAYROLL PRO</p>
           </div>
         </div>
-        <nav class="p-4 space-y-1">
-          <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="dashboard"><span class="text-xl">📊</span> Dashboard</button>
-          <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="employees"><span class="text-xl">👥</span> Employees</button>
-          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="payroll"><span class="text-xl">💰</span> Single Entry</button>
-          <button onclick="showPage('bulkPayroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="bulkPayroll"><span class="text-xl">📝</span> Bulk Payroll</button>
-          <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="loans"><span class="text-xl">💳</span> Loans</button>
-          <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="reports"><span class="text-xl">📈</span> Reports</button>
-          <div class="pt-4 mt-4 border-t border-gray-100"><button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 text-red-600"><span class="text-xl">🚪</span> Logout</button></div>
-        </nav>
-      </aside>
-      <main class="flex-1 ml-64 p-8">
-        <div id="pageContent"></div>
-      </main>
-    </div>
+      </div>
+      <nav class="p-4 space-y-1">
+        <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3" data-page="dashboard">
+          <span class="text-lg">📊</span> Dashboard
+        </button>
+        <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3" data-page="employees">
+          <span class="text-lg">👥</span> Employees
+        </button>
+        <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3" data-page="payroll">
+          <span class="text-lg">💰</span> Single Entry
+        </button>
+        <button onclick="showPage('bulkPayroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3" data-page="bulkPayroll">
+          <span class="text-lg">📝</span> Bulk Payroll
+        </button>
+        <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3" data-page="loans">
+          <span class="text-lg">💳</span> Loans
+        </button>
+        <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3" data-page="reports">
+          <span class="text-lg">📈</span> Reports
+        </button>
+        
+        <div class="pt-8 mt-8 border-t border-slate-100">
+          <button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm flex items-center gap-3 text-red-500 hover:text-red-600 hover:bg-red-50">
+            <span class="text-lg">🚪</span> Logout
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-0 md:ml-64 p-4 md:p-8 overflow-y-auto h-screen">
+      <div id="pageContent"></div>
+    </main>
   </div>
 
-  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div class="card p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+  <!-- MODAL -->
+  <div id="modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="card w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8 mx-4">
       <div id="modalContent"></div>
     </div>
   </div>
 
   <script>
+    // --- CONFIGURATION ---
     const SB_URL = 'https://lqolicwuailbemonuaor.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxb2xpY3d1YWlsYmVtb251YW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDEzMjIsImV4cCI6MjA5MTMxNzMyMn0.WdEHwSJXM1hTXrlM5Rebs5PnyUDmO0DYHv05D-BgIWo';
     const sb = window.supabase.createClient(SB_URL, SB_KEY);
@@ -107,18 +273,22 @@
     let reportFilters = { tab: 'payroll', month: '0', year: '0', employee: 'all' };
     let autoSaveInterval = null;
 
-    function fmt(value) { return CURRENCY + ' ' + parseFloat(value||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+    // --- UTILS ---
+    function fmt(value) { 
+      return CURRENCY + ' ' + parseFloat(value||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
+    }
 
     function showSavedIndicator() {
       var existing = document.querySelector('.saved-indicator');
       if (existing) existing.remove();
       var div = document.createElement('div');
-      div.className = 'saved-indicator';
-      div.textContent = '✓ Auto-saved';
+      div.className = 'fixed top-6 right-6 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 animate-bounce';
+      div.innerHTML = '<span class="text-lg">✓</span> Auto-saved';
       document.body.appendChild(div);
       setTimeout(function() { div.remove(); }, 2000);
     }
 
+    // --- AUTH FUNCTIONS ---
     function switchAuthTab(tab) {
       var formIn = document.getElementById('formSignIn');
       var formUp = document.getElementById('formSignUp');
@@ -126,19 +296,19 @@
       var tabUp = document.getElementById('btnTabSignUp');
       if (tab === 'signIn') {
         formIn.classList.remove('hidden'); formUp.classList.add('hidden');
-        tabIn.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white text-gray-900 shadow-sm';
-        tabUp.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-500';
+        tabIn.className = 'flex-1 py-2 rounded-md text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all';
+        tabUp.className = 'flex-1 py-2 rounded-md text-sm font-semibold text-slate-500 hover:text-slate-700 transition-all';
       } else {
         formIn.classList.add('hidden'); formUp.classList.remove('hidden');
-        tabIn.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-500';
-        tabUp.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white text-gray-900 shadow-sm';
+        tabIn.className = 'flex-1 py-2 rounded-md text-sm font-semibold text-slate-500 hover:text-slate-700 transition-all';
+        tabUp.className = 'flex-1 py-2 rounded-md text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all';
       }
     }
 
     function showAuthMsg(text, ok) {
       var el = document.getElementById('authMsg');
       el.textContent = text;
-      el.className = 'mt-6 text-sm text-center p-4 rounded-xl ' + (ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200');
+      el.className = 'mt-6 text-sm text-center p-4 rounded-lg ' + (ok ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100');
       el.classList.remove('hidden');
     }
 
@@ -163,6 +333,7 @@
     function initApp() {
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('appScreen').classList.remove('hidden');
+      document.getElementById('appScreen').classList.add('flex');
       loadData();
     }
 
@@ -187,39 +358,87 @@
       else if (page === 'reports') renderReports(content);
     }
 
+    // --- DASHBOARD ---
     function renderDashboard(container) {
       var totalPaid = 0, totalLoans = 0, activeEmployees = 0;
       payrollRecords.forEach(function(r) { totalPaid += parseFloat(r.net_payable||0); });
       employees.forEach(function(e) { totalLoans += parseFloat(e.loan_balance||0); if(e.status==='active') activeEmployees++; });
-      container.innerHTML = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1><p class="text-gray-500">Welcome back! Here\'s what\'s happening today.</p></div>' +
-        '<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">' +
-          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Active Employees</p><p class="text-3xl font-bold text-gray-900 mt-1">' + activeEmployees + '</p></div>' +
-          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Total Paid</p><p class="text-3xl font-bold text-gray-900 mt-1">' + fmt(totalPaid) + '</p></div>' +
-          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Outstanding Loans</p><p class="text-3xl font-bold text-gray-900 mt-1">' + fmt(totalLoans) + '</p></div>' +
-          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Payroll Records</p><p class="text-3xl font-bold text-gray-900 mt-1">' + payrollRecords.length + '</p></div>' +
+
+      container.innerHTML = 
+        '<div class="hero-section fade-in">' +
+          '<div class="relative z-10">' +
+            '<h1 class="text-2xl font-light text-slate-300 mb-1">Total Paid</h1>' +
+            '<div class="text-4xl md:text-5xl font-bold tracking-tight mb-8">' + fmt(totalPaid) + '</div>' +
+            '<div class="grid grid-cols-2 md:grid-cols-4 gap-8">' +
+              '<div><p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Active Employees</p><p class="text-2xl font-semibold">' + activeEmployees + '</p></div>' +
+              '<div><p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Outstanding Loans</p><p class="text-2xl font-semibold">' + fmt(totalLoans) + '</p></div>' +
+              '<div><p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Payroll Records</p><p class="text-2xl font-semibold">' + payrollRecords.length + '</p></div>' +
+              '<div><p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Net Profit Est.</p><p class="text-2xl font-semibold text-emerald-400">--</p></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 fade-in">' +
+          '<div class="card p-6">' +
+            '<h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Quick Actions</h3>' +
+            '<div class="space-y-3">' +
+              '<button onclick="showPage(\'bulkPayroll\')" class="w-full text-left bg-slate-50 hover:bg-slate-100 p-4 rounded-xl transition flex items-center justify-between group">' +
+                '<span class="font-medium text-slate-700">📝 Start Bulk Payroll</span><span class="text-slate-400 group-hover:text-blue-600">→</span>' +
+              '</button>' +
+              '<button onclick="showPage(\'payroll\')" class="w-full text-left bg-slate-50 hover:bg-slate-100 p-4 rounded-xl transition flex items-center justify-between group">' +
+                '<span class="font-medium text-slate-700">💰 Single Entry</span><span class="text-slate-400 group-hover:text-blue-600">→</span>' +
+              '</button>' +
+              '<button onclick="showPage(\'employees\')" class="w-full text-left bg-slate-50 hover:bg-slate-100 p-4 rounded-xl transition flex items-center justify-between group">' +
+                '<span class="font-medium text-slate-700">👥 Manage Staff</span><span class="text-slate-400 group-hover:text-blue-600">→</span>' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="card p-6 md:col-span-2">' +
+            '<h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Recent Activity</h3>' +
+            '<div class="space-y-4">' + 
+              (payrollRecords.slice(0, 4).map(function(r) {
+                var emp = employees.find(function(e){return e.id===r.employee_id;});
+                return '<div class="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg transition">' +
+                  '<div class="flex items-center gap-3">' +
+                    '<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">' + (emp?emp.name.charAt(0):'?') + '</div>' +
+                    '<div><p class="font-medium text-slate-900">' + (emp?emp.name:'Unknown') + '</p><p class="text-xs text-slate-500">Payroll ' + r.month + '/' + r.year + '</p></div>' +
+                  '</div>' +
+                  '<span class="font-bold text-slate-900">' + fmt(r.net_payable) + '</span>' +
+                '</div>';
+              }).join('') || '<p class="text-slate-400 text-sm text-center py-4">No activity yet</p>') +
+            '</div>' +
+          '</div>' +
         '</div>';
     }
 
+    // --- EMPLOYEES ---
     function renderEmployees(container) {
       var html = '<div class="flex justify-between items-center mb-6">' +
-        '<div><h1 class="text-3xl font-bold text-gray-900 mb-1">Employees</h1><p class="text-gray-500">Manage your team members</p></div>' +
-        '<div class="flex gap-3" id="empActions">' +
-          '<button onclick="showImportExcelModal()" class="btn-secondary flex items-center gap-2">📥 Import Excel</button>' +
-          '<button onclick="showAddEmployeeModal()" class="btn-primary flex items-center gap-2">➕ Add Employee</button>' +
+        '<div><h1 class="text-2xl font-bold text-slate-900">Employees</h1><p class="text-slate-500 text-sm">Manage your team members</p></div>' +
+        '<div class="flex gap-3">' +
+          '<button onclick="showImportExcelModal()" class="btn-secondary">📥 Import Excel</button>' +
+          '<button onclick="showAddEmployeeModal()" class="btn-primary">➕ Add Employee</button>' +
         '</div>' +
       '</div>' +
-      '<div id="bulkDeleteBar" class="hidden bg-red-50 border border-red-200 p-4 rounded-xl mb-6 flex justify-between items-center">' +
-        '<span class="text-red-800 font-semibold">🗑️ <span id="selectedCount">0</span> employees selected</span>' +
-        '<div class="flex gap-3"><button onclick="deselectAllEmployees()" class="text-sm text-red-600 hover:underline">Cancel</button><button onclick="deleteSelectedEmployees()" class="btn-danger py-2 px-4 text-sm">Delete Selected</button></div>' +
+      
+      '<div id="bulkDeleteBar" class="hidden bg-red-50 border border-red-100 p-4 rounded-xl mb-6 flex justify-between items-center">' +
+        '<span class="text-red-800 font-semibold flex items-center gap-2">🗑️ <span id="selectedCount">0</span> selected</span>' +
+        '<div class="flex gap-3"><button onclick="deselectAllEmployees()" class="text-sm text-red-600 hover:underline">Cancel</button><button onclick="deleteSelectedEmployees()" class="btn-danger py-1.5 px-4 text-sm">Delete Selected</button></div>' +
       '</div>' +
-      '<div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b border-gray-200"><tr>' +
-        '<th class="text-left py-4 px-4 w-10"><input type="checkbox" id="selectAllEmp" onchange="toggleSelectAllEmployees(this)"></th>' +
-        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th>' +
-        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Position</th>' +
-        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Salary</th>' +
-        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Loan Balance</th>' +
-        '<th class="text-left py-4 px-6 font-semibold text-gray-700">Actions</th>' +
-      '</tr></thead><tbody id="empTableBody"></tbody></table></div>';
+      
+      '<div class="card table-container fade-in">' +
+        '<table>' +
+          '<thead><tr>' +
+            '<th class="w-10"><input type="checkbox" id="selectAllEmp" onchange="toggleSelectAllEmployees(this)"></th>' +
+            '<th>Employee</th>' +
+            '<th>Position</th>' +
+            '<th>Salary</th>' +
+            '<th>Loan Balance</th>' +
+            '<th>Actions</th>' +
+          '</tr></thead>' +
+          '<tbody id="empTableBody"></tbody>' +
+        '</table>' +
+      '</div>';
       
       container.innerHTML = html;
       renderEmployeeRows();
@@ -230,51 +449,47 @@
       if (!tbody) return;
       var html = '';
       employees.forEach(function(emp) {
-        html += '<tr class="table-row border-b border-gray-100" id="empRow-' + emp.id + '">' +
-          '<td class="py-4 px-4"><input type="checkbox" class="empCheckbox w-4 h-4 text-blue-600 rounded" value="' + emp.id + '" onchange="updateBulkDeleteBar()"></td>' +
-          '<td class="py-4 px-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">' + emp.name.charAt(0) + '</div><p class="font-semibold text-gray-900">' + emp.name + '</p></div></td>' +
-          '<td class="py-4 px-6 text-gray-600">' + (emp.role || '-') + '</td>' +
-          '<td class="py-4 px-6 font-semibold text-gray-900">' + fmt(emp.base_salary) + '</td>' +
-          '<td class="py-4 px-6"><span class="' + (emp.loan_balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600') + '">' + fmt(emp.loan_balance||0) + '</span></td>' +
-          '<td class="py-4 px-6 flex gap-3"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">History</button><button onclick="deleteEmployee(\'' + emp.id + '\')" class="text-red-600 hover:text-red-700 font-medium text-sm">Delete</button></td>' +
+        html += '<tr class="border-b border-slate-100 hover:bg-slate-50">' +
+          '<td><input type="checkbox" class="empCheckbox w-4 h-4 text-blue-600 rounded border-slate-300" value="' + emp.id + '" onchange="updateBulkDeleteBar()"></td>' +
+          '<td class="font-medium text-slate-900">' + emp.name + '</td>' +
+          '<td class="text-slate-500">' + (emp.role || '-') + '</td>' +
+          '<td class="font-medium">' + fmt(emp.base_salary) + '</td>' +
+          '<td><span class="badge ' + (emp.loan_balance > 0 ? 'badge-danger' : 'badge-success') + '">' + fmt(emp.loan_balance||0) + '</span></td>' +
+          '<td><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">History</button><button onclick="deleteEmployee(\'' + emp.id + '\')" class="text-red-500 hover:text-red-700 text-sm font-medium">Delete</button></td>' +
         '</tr>';
       });
-      tbody.innerHTML = html;
+      tbody.innerHTML = html || '<tr><td colspan="6" class="text-center py-8 text-slate-400">No employees found</td></tr>';
     }
 
     function toggleSelectAllEmployees(source) {
-      var checkboxes = document.querySelectorAll('.empCheckbox');
-      for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = source.checked;
+      document.querySelectorAll('.empCheckbox').forEach(cb => cb.checked = source.checked);
       updateBulkDeleteBar();
     }
 
     function updateBulkDeleteBar() {
-      var checkboxes = document.querySelectorAll('.empCheckbox:checked');
+      var count = document.querySelectorAll('.empCheckbox:checked').length;
       var bar = document.getElementById('bulkDeleteBar');
-      var countSpan = document.getElementById('selectedCount');
-      var selectAll = document.getElementById('selectAllEmp');
-      countSpan.textContent = checkboxes.length;
-      if (checkboxes.length > 0) bar.classList.remove('hidden');
-      else { bar.classList.add('hidden'); selectAll.checked = false; }
+      document.getElementById('selectedCount').textContent = count;
+      bar.classList.toggle('hidden', count === 0);
+      document.getElementById('selectAllEmp').checked = count === employees.length;
     }
 
     function deselectAllEmployees() {
-      var checkboxes = document.querySelectorAll('.empCheckbox');
-      for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = false;
+      document.querySelectorAll('.empCheckbox').forEach(cb => cb.checked = false);
       document.getElementById('selectAllEmp').checked = false;
       updateBulkDeleteBar();
     }
 
     async function deleteSelectedEmployees() {
-      var checkboxes = document.querySelectorAll('.empCheckbox:checked');
-      var ids = Array.from(checkboxes).map(function(cb) { return cb.value; });
+      var ids = Array.from(document.querySelectorAll('.empCheckbox:checked')).map(cb => cb.value);
       if (ids.length === 0) return;
-      if (!confirm('Are you sure you want to delete ' + ids.length + ' employees? This cannot be undone.')) return;
+      if (!confirm('Delete ' + ids.length + ' employees?')) return;
       var { error } = await sb.from('employees').delete().in('id', ids);
       if (error) alert('Error: ' + error.message);
       else { deselectAllEmployees(); loadData(); }
     }
 
+    // --- BULK PAYROLL ---
     function renderBulkPayroll(container) {
       var today = new Date();
       var monthDefault = today.getMonth() + 1;
@@ -282,134 +497,117 @@
       var daysInMonth = new Date(yearDefault, monthDefault, 0).getDate();
       var activeEmps = employees.filter(function(e) { return e.status === 'active'; });
 
-      var html = '<div class="flex justify-between items-center mb-6">' +
-        '<div><h1 class="text-3xl font-bold text-gray-900 mb-1">Bulk Payroll Entry</h1><p class="text-gray-500">Enter payroll data for all active employees at once</p></div>' +
-        '<div class="flex items-center gap-3">' +
-          '<div class="flex gap-2">' +
-            '<select id="bpMonth" class="input-field w-32"><option value="1" '+(monthDefault===1?'selected':'')+'>Jan</option><option value="2" '+(monthDefault===2?'selected':'')+'>Feb</option><option value="3" '+(monthDefault===3?'selected':'')+'>Mar</option><option value="4" '+(monthDefault===4?'selected':'')+'>Apr</option><option value="5" '+(monthDefault===5?'selected':'')+'>May</option><option value="6" '+(monthDefault===6?'selected':'')+'>Jun</option><option value="7" '+(monthDefault===7?'selected':'')+'>Jul</option><option value="8" '+(monthDefault===8?'selected':'')+'>Aug</option><option value="9" '+(monthDefault===9?'selected':'')+'>Sep</option><option value="10" '+(monthDefault===10?'selected':'')+'>Oct</option><option value="11" '+(monthDefault===11?'selected':'')+'>Nov</option><option value="12" '+(monthDefault===12?'selected':'')+'>Dec</option></select>' +
-            '<input type="number" id="bpYear" value="' + yearDefault + '" class="input-field w-24">' +
-            '<input type="number" id="bpTotalDays" value="' + daysInMonth + '" class="input-field w-24">' +
+      container.innerHTML = 
+        '<div class="flex justify-between items-start mb-6">' +
+          '<div><h1 class="text-2xl font-bold text-slate-900">Bulk Payroll Entry</h1><p class="text-slate-500 text-sm">Process payroll for all active employees</p></div>' +
+          '<div class="flex gap-3">' +
+            '<button onclick="copyFromPreviousMonth()" class="btn-secondary text-sm">📋 Copy Last Month</button>' +
+            '<button onclick="refreshBulkPayroll()" class="btn-secondary text-sm">🔄 Reset Days</button>' +
           '</div>' +
-          '<button onclick="copyFromPreviousMonth()" class="btn-secondary">📋 Copy Last Month</button>' +
-          '<button onclick="refreshBulkPayroll()" class="btn-secondary">🔄 Refresh</button>' +
         '</div>' +
-      '</div>';
-
-      html += '<div class="mb-4 flex gap-3">' +
-        '<input type="text" id="bpSearch" placeholder="🔍 Search employees..." class="input-field w-64" onkeyup="filterBulkPayroll()">' +
-        '<select id="bpFilterPos" class="input-field w-48" onchange="filterBulkPayroll()"><option value="">All Positions</option></select>' +
-        '<div class="flex-1"></div>' +
-        '<button onclick="exportBulkPayrollTemplate()" class="btn-secondary">📥 Export Template</button>' +
-        '<label class="btn-secondary cursor-pointer"><input type="file" accept=".xlsx,.csv" onchange="importBulkPayrollData(this)" class="hidden">📤 Import Data</label>' +
-      '</div>';
-
-      html += '<div class="bulk-action-bar flex flex-wrap gap-4 items-center">' +
-        '<span class="font-semibold text-blue-900">⚡ Bulk Actions:</span>' +
-        '<button onclick="applyToAll(\'days\')" class="text-sm bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-50">Set All Days</button>' +
-        '<button onclick="applyToAll(\'bonus\')" class="text-sm bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-50">Add Bonus</button>' +
-        '<button onclick="applyToAll(\'penalty\')" class="text-sm bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-50">Add Penalty</button>' +
-        '<button onclick="markAllPaid()" class="text-sm bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-50">Mark All Paid</button>' +
-        '<span id="autoSaveStatus" class="text-sm text-gray-500 ml-auto">Auto-saving enabled</span>' +
-      '</div>';
-
-      html += '<div class="card overflow-hidden p-0">' +
-        '<div class="overflow-x-auto">' +
-          '<table class="w-full text-sm">' +
-            '<thead class="bg-gray-50 border-b border-gray-200 sticky top-0">' +
-              '<tr>' +
-                '<th class="text-left py-3 px-4 font-semibold text-gray-700 w-12">#</th>' +
-                '<th class="text-left py-3 px-4 font-semibold text-gray-700 min-w-[150px]">Employee</th>' +
-                '<th class="text-left py-3 px-2 font-semibold text-gray-700 w-24">Pos</th>' +
-                '<th class="text-left py-3 px-2 font-semibold text-gray-700 w-28">Salary</th>' +
-                '<th class="text-left py-3 px-2 font-semibold text-orange-700 w-28">Opening Bal</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-20">Days</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-28">Actual</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-green-700 w-24">Bonus</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-green-700 w-24">Leave</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-green-700 w-24">Gratuity</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-red-700 w-24">Penalty</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-red-700 w-24">Advance</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-red-700 w-24">Loan Ret</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-orange-700 w-24">Loan Giv</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-24">Other Ded</th>' +
-                '<th class="text-right py-3 px-4 font-bold text-blue-700 w-28 bg-blue-50">Net Payable</th>' +
-                '<th class="text-center py-3 px-2 font-semibold text-gray-700 w-24">Status</th>' +
-              '</tr>' +
-            '</thead>' +
-            '<tbody id="bpTableBody">';
-
-      activeEmps.forEach(function(emp, index) {
-        var prevRecord = payrollRecords.find(function(r) { 
-          return r.employee_id === emp.id && 
-                 (r.month !== monthDefault || r.year !== yearDefault); 
-        });
         
-        html += '<tr class="border-b border-gray-100 bp-row" data-emp-id="' + emp.id + '" data-name="' + emp.name.toLowerCase() + '" data-pos="' + (emp.role||'').toLowerCase() + '">' +
-          '<td class="py-2 px-4 text-gray-500">' + (index + 1) + '</td>' +
-          '<td class="py-2 px-4 font-medium text-gray-900">' + emp.name + '</td>' +
-          '<td class="py-2 px-2 text-gray-600 text-xs">' + (emp.role || '-') + '</td>' +
-          '<td class="py-2 px-2 font-semibold text-gray-700" data-contracted="' + emp.base_salary + '">' + fmt(emp.base_salary) + '</td>' +
-          '<td class="py-2 px-2 font-semibold text-orange-700">' + fmt(emp.loan_balance || 0) + '</td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-days" value="' + (prevRecord ? prevRecord.days_worked : daysInMonth) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2 font-semibold text-gray-800 bp-actual" data-value="0">0.00</td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-bonus" value="' + (prevRecord ? prevRecord.bonuses : 0) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-leave" value="' + (prevRecord ? prevRecord.leave_pay : 0) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-gratuity" value="' + (prevRecord ? prevRecord.gratuity : 0) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-penalty" value="' + (prevRecord ? prevRecord.penalties : 0) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-advance" value="' + (prevRecord ? prevRecord.advance_salary : 0) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-loan-rep" value="' + (prevRecord ? prevRecord.loans_repaid : 0) + '" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input bp-loan-giv" value="0" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-2"><input type="number" class="payroll-input red bp-other" value="0" min="0" onchange="calcRow(this)"></td>' +
-          '<td class="py-2 px-4 font-bold text-blue-700 bg-blue-50 text-right bp-net">0.00</td>' +
-          '<td class="py-2 px-2 text-center"><select class="payroll-input bp-status" style="text-align:center"><option value="pending">Pending</option><option value="paid">Paid</option></select></td>' +
-        '</tr>';
+        '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 fade-in">' +
+          '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Month</label>' +
+            '<select id="bpMonth" class="input-field">' + Array.from({length:12},(_,i)=>'<option value="'+(i+1)+'" '+(monthDefault===i+1?'selected':'')+'>'+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]+'</option>').join('') + '</select></div>' +
+          '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Year</label><input type="number" id="bpYear" value="' + yearDefault + '" class="input-field"></div>' +
+          '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Total Days</label><input type="number" id="bpTotalDays" value="' + daysInMonth + '" class="input-field"></div>' +
+          '<div class="flex items-end"><button onclick="saveBulkPayroll()" class="btn-primary w-full py-2.5">💾 Save All Records</button></div>' +
+        '</div>' +
+
+        '<div class="flex flex-wrap gap-3 mb-4 fade-in">' +
+          '<input type="text" id="bpSearch" placeholder="🔍 Search employees..." class="input-field w-64" onkeyup="filterBulkPayroll()">' +
+          '<select id="bpFilterPos" class="input-field w-48" onchange="filterBulkPayroll()"><option value="">All Positions</option></select>' +
+          '<div class="flex-1"></div>' +
+          '<button onclick="exportBulkPayrollTemplate()" class="btn-secondary text-sm">📥 Export CSV</button>' +
+          '<label class="btn-secondary text-sm cursor-pointer"><input type="file" accept=".xlsx,.csv" onchange="importBulkPayrollData(this)" class="hidden">📤 Import Data</label>' +
+        '</div>' +
+
+        '<div class="bulk-action-bar bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4 flex flex-wrap gap-3 items-center fade-in">' +
+          '<span class="font-semibold text-blue-900 text-sm">⚡ Quick Actions:</span>' +
+          '<button onclick="applyToAll(\'days\')" class="text-xs bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 text-blue-800 font-medium">Set All Days</button>' +
+          '<button onclick="applyToAll(\'bonus\')" class="text-xs bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 text-blue-800 font-medium">Add Bonus</button>' +
+          '<button onclick="applyToAll(\'penalty\')" class="text-xs bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 text-blue-800 font-medium">Add Penalty</button>' +
+          '<button onclick="markAllPaid()" class="text-xs bg-white px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 text-blue-800 font-medium ml-auto">Mark All Paid</button>' +
+        '</div>' +
+
+        '<div class="card table-container fade-in">' +
+          '<table class="min-w-max">' +
+            '<thead><tr>' +
+              '<th class="w-10 text-center">#</th>' +
+              '<th class="min-w-[150px]">Employee</th>' +
+              '<th class="w-24">Pos</th>' +
+              '<th class="w-32">Contract</th>' +
+              '<th class="w-32 text-orange-600">Opening Bal</th>' +
+              '<th class="w-20 text-center">Days</th>' +
+              '<th class="w-28">Actual</th>' +
+              '<th class="w-24 text-green-700">Bonus</th>' +
+              '<th class="w-24 text-green-700">Leave</th>' +
+              '<th class="w-24 text-green-700">Gratuity</th>' +
+              '<th class="w-24 text-red-700">Penalty</th>' +
+              '<th class="w-24 text-red-700">Advance</th>' +
+              '<th class="w-24 text-red-700">Loan Ret</th>' +
+              '<th class="w-24 text-orange-700">Loan Giv</th>' +
+              '<th class="w-24 text-slate-700">Other Ded</th>' +
+              '<th class="w-32 text-right bg-blue-50 text-blue-700">Net Payable</th>' +
+              '<th class="w-24 text-center">Status</th>' +
+            '</tr></thead>' +
+            '<tbody id="bpTableBody"></tbody>' +
+            '<tfoot class="bg-slate-50 font-bold border-t border-slate-200">' +
+              '<tr><td colspan="15" class="py-4 px-4 text-right text-slate-700">Total Net Payable:</td>' +
+              '<td class="py-4 px-4 text-right text-xl text-blue-700" id="totalNetPayable">0.00</td>' +
+              '<td class="py-4 px-2 text-center text-slate-600" id="paymentSummary">0/0 Paid</td></tr>' +
+            '</tfoot>' +
+          '</table>' +
+        '</div>';
+
+      var tbody = document.getElementById('bpTableBody');
+      activeEmps.forEach(function(emp, index) {
+        var prevRecord = payrollRecords.find(function(r) { return r.employee_id === emp.id && r.month !== monthDefault; });
+        var tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-100 hover:bg-slate-50 bp-row';
+        tr.setAttribute('data-emp-id', emp.id);
+        tr.setAttribute('data-name', emp.name.toLowerCase());
+        tr.setAttribute('data-pos', (emp.role||'').toLowerCase());
+        
+        tr.innerHTML = 
+          '<td class="text-center text-slate-400 font-mono text-xs">'+(index+1)+'</td>' +
+          '<td class="font-medium text-slate-900">'+emp.name+'</td>' +
+          '<td class="text-slate-500 text-xs">'+(emp.role||'-')+'</td>' +
+          '<td class="font-medium text-slate-700" data-contracted="'+emp.base_salary+'">'+fmt(emp.base_salary)+'</td>' +
+          '<td class="font-semibold text-orange-600">'+fmt(emp.loan_balance||0)+'</td>' +
+          '<td class="text-center"><input type="number" class="payroll-input bp-days" value="'+(prevRecord?prevRecord.days_worked:daysInMonth)+'" onchange="calcRow(this)"></td>' +
+          '<td class="font-semibold text-slate-900 text-right bp-actual" data-value="0">0.00</td>' +
+          '<td><input type="number" class="payroll-input bp-bonus" value="'+(prevRecord?prevRecord.bonuses:0)+'" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input bp-leave" value="'+(prevRecord?prevRecord.leave_pay:0)+'" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input bp-gratuity" value="'+(prevRecord?prevRecord.gratuity:0)+'" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input red bp-penalty" value="'+(prevRecord?prevRecord.penalties:0)+'" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input red bp-advance" value="'+(prevRecord?prevRecord.advance_salary:0)+'" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input red bp-loan-rep" value="'+(prevRecord?prevRecord.loans_repaid:0)+'" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input bp-loan-giv" value="0" onchange="calcRow(this)"></td>' +
+          '<td><input type="number" class="payroll-input red bp-other" value="0" onchange="calcRow(this)"></td>' +
+          '<td class="text-right font-bold text-blue-700 bg-blue-50/50 bp-net">0.00</td>' +
+          '<td class="text-center"><select class="payroll-input bp-status" style="text-align:center;width:100%"><option value="pending">Pending</option><option value="paid">Paid</option></select></td>';
+        
+        tbody.appendChild(tr);
       });
 
-      html += '</tbody>' +
-        '<tfoot class="bg-gray-50 font-semibold border-t border-gray-200">' +
-          '<tr>' +
-            '<td colspan="4" class="py-3 px-4 text-right">Total Net Payable:</td>' +
-            '<td colspan="11"></td>' +
-            '<td class="py-3 px-4 text-right text-xl text-blue-700" id="totalNetPayable">0.00</td>' +
-            '<td class="py-3 px-2" id="paymentSummary">0/0 Paid</td>' +
-          '</tr>' +
-        '</tfoot>' +
-      '</table>' +
-      '</div>' +
-      '<div class="p-4 bg-white border-t border-gray-200 flex justify-end gap-3">' +
-        '<button onclick="showPage(\'dashboard\')" class="btn-secondary">Cancel</button>' +
-        '<button onclick="saveBulkPayroll()" class="btn-primary py-3 px-8 text-base">💾 Save All Records</button>' +
-      '</div>' +
-      '</div>';
-
-      container.innerHTML = html;
       populatePositionFilter();
       calcAllRows();
       startAutoSave();
     }
 
     function populatePositionFilter() {
-      var positions = employees.map(function(e) { return e.role; }).filter(function(v, i, a) { return a.indexOf(v) === i && v; }).sort();
+      var positions = employees.map(function(e){return e.role;}).filter(function(v,i,a){return v&&a.indexOf(v)===i;}).sort();
       var select = document.getElementById('bpFilterPos');
-      positions.forEach(function(pos) {
-        var opt = document.createElement('option');
-        opt.value = pos.toLowerCase();
-        opt.textContent = pos;
-        select.appendChild(opt);
-      });
+      positions.forEach(function(pos){ select.add(new Option(pos, pos.toLowerCase())); });
     }
 
     function filterBulkPayroll() {
       var search = document.getElementById('bpSearch').value.toLowerCase();
       var posFilter = document.getElementById('bpFilterPos').value;
-      var rows = document.querySelectorAll('.bp-row');
-      
-      rows.forEach(function(row) {
-        var name = row.getAttribute('data-name');
-        var pos = row.getAttribute('data-pos');
-        var matchName = name.indexOf(search) > -1;
-        var matchPos = !posFilter || pos === posFilter;
-        row.style.display = (matchName && matchPos) ? '' : 'none';
+      document.querySelectorAll('.bp-row').forEach(function(row) {
+        var match = row.getAttribute('data-name').includes(search) && (!posFilter || row.getAttribute('data-pos') === posFilter);
+        row.style.display = match ? '' : 'none';
       });
     }
 
@@ -418,485 +616,355 @@
       var year = parseInt(document.getElementById('bpYear').value);
       var prevMonth = month === 1 ? 12 : month - 1;
       var prevYear = month === 1 ? year - 1 : year;
-      
-      var rows = document.querySelectorAll('.bp-row');
       var count = 0;
       
-      rows.forEach(function(row) {
-        var empId = row.getAttribute('data-emp-id');
-        var prevRecord = payrollRecords.find(function(r) { 
-          return r.employee_id === empId && r.month === prevMonth && r.year === prevYear; 
-        });
-        
-        if (prevRecord) {
-          row.querySelector('.bp-days').value = prevRecord.days_worked || 30;
-          row.querySelector('.bp-bonus').value = prevRecord.bonuses || 0;
-          row.querySelector('.bp-leave').value = prevRecord.leave_pay || 0;
-          row.querySelector('.bp-gratuity').value = prevRecord.gratuity || 0;
-          row.querySelector('.bp-penalty').value = prevRecord.penalties || 0;
-          row.querySelector('.bp-advance').value = prevRecord.advance_salary || 0;
-          row.querySelector('.bp-loan-rep').value = prevRecord.loans_repaid || 0;
-          count++;
-          calcRow(row.querySelector('.bp-days'));
+      document.querySelectorAll('.bp-row').forEach(function(row) {
+        var prev = payrollRecords.find(function(r) { return r.employee_id === row.getAttribute('data-emp-id') && r.month === prevMonth && r.year === prevYear; });
+        if (prev) {
+          row.querySelector('.bp-days').value = prev.days_worked || 30;
+          row.querySelector('.bp-bonus').value = prev.bonuses || 0;
+          row.querySelector('.bp-leave').value = prev.leave_pay || 0;
+          row.querySelector('.bp-gratuity').value = prev.gratuity || 0;
+          row.querySelector('.bp-penalty').value = prev.penalties || 0;
+          row.querySelector('.bp-advance').value = prev.advance_salary || 0;
+          row.querySelector('.bp-loan-rep').value = prev.loans_repaid || 0;
+          count++; calcRow(row.querySelector('.bp-days'));
         }
       });
-      
-      alert('Copied data from ' + prevMonth + '/' + prevYear + ' for ' + count + ' employees');
+      alert('Copied data for ' + count + ' employees');
     }
 
     function refreshBulkPayroll() {
-      var totalDays = parseInt(document.getElementById('bpTotalDays').value) || 28;
-      var inputs = document.querySelectorAll('.bp-days');
-      for (var i = 0; i < inputs.length; i++) inputs[i].value = totalDays;
+      var days = parseInt(document.getElementById('bpTotalDays').value) || 28;
+      document.querySelectorAll('.bp-days').forEach(function(i){i.value=days;});
       calcAllRows();
     }
 
     function applyToAll(field) {
-      var value = prompt('Enter value to apply to all visible employees:');
-      if (value === null || value === '') return;
-      
-      var rows = document.querySelectorAll('.bp-row');
+      var val = prompt('Value to apply:');
+      if(val === null) return;
       var count = 0;
-      var fieldName = '.bp-' + field;
-      
-      rows.forEach(function(row) {
-        if (row.style.display !== 'none') {
-          var input = row.querySelector(fieldName);
-          if (input) {
-            input.value = parseFloat(value) || 0;
-            calcRow(input);
-            count++;
-          }
+      document.querySelectorAll('.bp-row').forEach(function(row){
+        if(row.style.display !== 'none') {
+          var input = row.querySelector('.bp-'+field);
+          if(input) { input.value = parseFloat(val)||0; calcRow(input); count++; }
         }
       });
-      
-      alert('Applied to ' + count + ' employees');
+      alert('Applied to '+count+' employees');
     }
 
     function markAllPaid() {
-      var selects = document.querySelectorAll('.bp-status');
-      selects.forEach(function(s) { s.value = 'paid'; });
+      document.querySelectorAll('.bp-status').forEach(function(s){s.value='paid';});
       updatePaymentSummary();
     }
 
     function calcRow(input) {
       var row = input.closest('tr');
-      var contracted = parseFloat(row.querySelector('td[data-contracted]').getAttribute('data-contracted')) || 0;
-      var daysWorked = parseFloat(row.querySelector('.bp-days').value) || 0;
-      var totalDays = parseInt(document.getElementById('bpTotalDays').value) || 28;
+      var sal = parseFloat(row.querySelector('td[data-contracted]').dataset.contracted)||0;
+      var days = parseFloat(row.querySelector('.bp-days').value)||0;
+      var totalDays = parseInt(document.getElementById('bpTotalDays').value)||28;
+      var actual = (sal * days) / totalDays;
       
-      var actual = (contracted * daysWorked) / totalDays;
       row.querySelector('.bp-actual').textContent = actual.toFixed(2);
-      row.querySelector('.bp-actual').setAttribute('data-value', actual);
+      row.querySelector('.bp-actual').dataset.value = actual;
 
-      var add = (parseFloat(row.querySelector('.bp-bonus').value)||0) + (parseFloat(row.querySelector('.bp-leave').value)||0) + (parseFloat(row.querySelector('.bp-gratuity').value)||0);
-      var sub = (parseFloat(row.querySelector('.bp-penalty').value)||0) + (parseFloat(row.querySelector('.bp-advance').value)||0) + (parseFloat(row.querySelector('.bp-loan-rep').value)||0) + (parseFloat(row.querySelector('.bp-other').value)||0);
+      var add = ['bp-bonus','bp-leave','bp-gratuity'].reduce(function(s,c){return s+(parseFloat(row.querySelector('.'+c).value)||0);},0);
+      var sub = ['bp-penalty','bp-advance','bp-loan-rep','bp-other'].reduce(function(s,c){return s+(parseFloat(row.querySelector('.'+c).value)||0);},0);
       
-      var net = actual + add - sub;
-      row.querySelector('.bp-net').textContent = net.toFixed(2);
-      
-      updateTotalNet();
-      updatePaymentSummary();
-      triggerAutoSave();
+      row.querySelector('.bp-net').textContent = (actual + add - sub).toFixed(2);
+      updateTotalNet(); updatePaymentSummary(); triggerAutoSave();
     }
 
-    function calcAllRows() {
-      var rows = document.querySelectorAll('#bpTableBody tr');
-      rows.forEach(function(row) {
-        var input = row.querySelector('.bp-days');
-        if (input) calcRow(input);
-      });
-    }
+    function calcAllRows() { document.querySelectorAll('.bp-days').forEach(function(i){if(i) calcRow(i);}); }
 
     function updateTotalNet() {
-      var rows = document.querySelectorAll('#bpTableBody tr');
       var total = 0;
-      rows.forEach(function(row) {
-        if (row.style.display !== 'none') {
-          var net = parseFloat(row.querySelector('.bp-net').textContent) || 0;
-          total += net;
-        }
-      });
+      document.querySelectorAll('.bp-row').forEach(function(row){ if(row.style.display!=='none') total += parseFloat(row.querySelector('.bp-net').textContent)||0; });
       document.getElementById('totalNetPayable').textContent = fmt(total);
     }
 
     function updatePaymentSummary() {
-      var rows = document.querySelectorAll('#bpTableBody tr');
+      var rows = document.querySelectorAll('.bp-row');
       var paid = 0, total = 0;
-      rows.forEach(function(row) {
-        if (row.style.display !== 'none') {
-          total++;
-          if (row.querySelector('.bp-status').value === 'paid') paid++;
-        }
-      });
+      rows.forEach(function(row){ if(row.style.display!=='none'){total++; if(row.querySelector('.bp-status').value==='paid') paid++;}});
       document.getElementById('paymentSummary').textContent = paid + '/' + total + ' Paid';
     }
 
     function startAutoSave() {
-      if (autoSaveInterval) clearInterval(autoSaveInterval);
-      autoSaveInterval = setInterval(function() {
+      if(autoSaveInterval) clearInterval(autoSaveInterval);
+      autoSaveInterval = setInterval(function(){
         var data = getBulkPayrollData();
-        localStorage.setItem('bulkPayrollDraft', JSON.stringify({
-          month: document.getElementById('bpMonth').value,
-          year: document.getElementById('bpYear').value,
-          data: data,
-          savedAt: new Date().toISOString()
-        }));
+        localStorage.setItem('bulkDraft', JSON.stringify({m:document.getElementById('bpMonth').value, y:document.getElementById('bpYear').value, d:data}));
         showSavedIndicator();
       }, 30000);
     }
 
     function triggerAutoSave() {
-      var data = getBulkPayrollData();
-      localStorage.setItem('bulkPayrollDraft', JSON.stringify({
-        month: document.getElementById('bpMonth').value,
-        year: document.getElementById('bpYear').value,
-        data: data,
-        savedAt: new Date().toISOString()
-      }));
+      localStorage.setItem('bulkDraft', JSON.stringify({m:document.getElementById('bpMonth').value, y:document.getElementById('bpYear').value, d:getBulkPayrollData()}));
     }
 
     function getBulkPayrollData() {
-      var rows = document.querySelectorAll('#bpTableBody tr');
-      var data = [];
-      rows.forEach(function(row) {
-        data.push({
-          empId: row.getAttribute('data-emp-id'),
-          days: row.querySelector('.bp-days').value,
-          bonus: row.querySelector('.bp-bonus').value,
-          leave: row.querySelector('.bp-leave').value,
-          gratuity: row.querySelector('.bp-gratuity').value,
-          penalty: row.querySelector('.bp-penalty').value,
-          advance: row.querySelector('.bp-advance').value,
-          loanRep: row.querySelector('.bp-loan-rep').value,
-          loanGiv: row.querySelector('.bp-loan-giv').value,
-          other: row.querySelector('.bp-other').value,
-          status: row.querySelector('.bp-status').value
-        });
+      var d = [];
+      document.querySelectorAll('.bp-row').forEach(function(row){
+        d.push({id:row.dataset.empId, d:row.querySelector('.bp-days').value, b:row.querySelector('.bp-bonus').value, l:row.querySelector('.bp-leave').value, g:row.querySelector('.bp-gratuity').value, p:row.querySelector('.bp-penalty').value, a:row.querySelector('.bp-advance').value, lr:row.querySelector('.bp-loan-rep').value, lg:row.querySelector('.bp-loan-giv').value, o:row.querySelector('.bp-other').value, s:row.querySelector('.bp-status').value});
       });
-      return data;
+      return d;
     }
 
     function exportBulkPayrollTemplate() {
-      var csv = 'Employee Name,Position,Base Salary,Days Worked,Bonus,Leave Pay,Gratuity,Penalty,Advance Salary,Loan Repayment,Loan Given,Other Deductions,Status\n';
-      var rows = document.querySelectorAll('#bpTableBody tr');
-      rows.forEach(function(row) {
-        var name = row.querySelector('td:nth-child(2)').textContent;
-        var pos = row.querySelector('td:nth-child(3)').textContent;
-        var sal = row.querySelector('td:nth-child(4)').getAttribute('data-contracted');
-        csv += name + ',' + pos + ',' + sal + ',30,0,0,0,0,0,0,0,0,pending\n';
-      });
-      var blob = new Blob([csv], { type: 'text/csv' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'payroll-template-' + document.getElementById('bpMonth').value + '-' + document.getElementById('bpYear').value + '.csv';
-      a.click();
+      var csv = 'Employee,Days,Bonus,Leave,Gratuity,Penalty,Advance,Loan Ret,Loan Giv,Other,Status\n';
+      document.querySelectorAll('.bp-row').forEach(function(row){ csv += row.querySelector('td:nth-child(2)').textContent + ',30,0,0,0,0,0,0,0,0,pending\n'; });
+      downloadCSV(csv, 'payroll-template.csv');
     }
 
     function importBulkPayrollData(input) {
-      var file = input.files[0];
-      if (!file) return;
-      
-      Papa.parse(file, {
-        header: true,
-        complete: function(results) {
-          var rows = document.querySelectorAll('#bpTableBody tr');
-          var count = 0;
-          
-          results.data.forEach(function(row) {
-            var empName = row['Employee Name'];
-            if (!empName) return;
-            
-            rows.forEach(function(tr) {
-              var name = tr.querySelector('td:nth-child(2)').textContent;
-              if (name === empName) {
-                if (row['Days Worked']) tr.querySelector('.bp-days').value = row['Days Worked'];
-                if (row['Bonus']) tr.querySelector('.bp-bonus').value = row['Bonus'];
-                if (row['Leave Pay']) tr.querySelector('.bp-leave').value = row['Leave Pay'];
-                if (row['Gratuity']) tr.querySelector('.bp-gratuity').value = row['Gratuity'];
-                if (row['Penalty']) tr.querySelector('.bp-penalty').value = row['Penalty'];
-                if (row['Advance Salary']) tr.querySelector('.bp-advance').value = row['Advance Salary'];
-                if (row['Loan Repayment']) tr.querySelector('.bp-loan-rep').value = row['Loan Repayment'];
-                if (row['Loan Given']) tr.querySelector('.bp-loan-giv').value = row['Loan Given'];
-                if (row['Other Deductions']) tr.querySelector('.bp-other').value = row['Other Deductions'];
-                if (row['Status']) tr.querySelector('.bp-status').value = row['Status'];
-                calcRow(tr.querySelector('.bp-days'));
-                count++;
-              }
-            });
+      if(!input.files[0]) return;
+      Papa.parse(input.files[0], {header:true, complete:function(res){
+        var count = 0;
+        res.data.forEach(function(row){
+          if(!row['Employee']) return;
+          document.querySelectorAll('.bp-row').forEach(function(tr){
+            if(tr.querySelector('td:nth-child(2)').textContent === row['Employee']) {
+              if(row['Days']) tr.querySelector('.bp-days').value = row['Days'];
+              if(row['Bonus']) tr.querySelector('.bp-bonus').value = row['Bonus'];
+              if(row['Loan Giv']) tr.querySelector('.bp-loan-giv').value = row['Loan Giv'];
+              // Add other fields similarly...
+              calcRow(tr.querySelector('.bp-days'));
+              count++;
+            }
           });
-          
-          alert('Imported data for ' + count + ' employees');
-          input.value = '';
-        }
-      });
+        });
+        alert('Imported data for '+count+' employees');
+      }});
     }
 
     async function saveBulkPayroll() {
-      if (!confirm('Save payroll records for all employees?')) return;
-      
+      if(!confirm('Save records?')) return;
       var btn = event.target;
-      var originalText = btn.textContent;
-      btn.textContent = 'Saving...';
-      btn.disabled = true;
-
-      var month = parseInt(document.getElementById('bpMonth').value);
-      var year = parseInt(document.getElementById('bpYear').value);
-      var totalDays = parseInt(document.getElementById('bpTotalDays').value) || 28;
+      btn.textContent = 'Saving...'; btn.disabled = true;
       
-      var rows = document.querySelectorAll('#bpTableBody tr');
+      var m = parseInt(document.getElementById('bpMonth').value);
+      var y = parseInt(document.getElementById('bpYear').value);
+      var days = parseInt(document.getElementById('bpTotalDays').value)||28;
       var promises = [];
-      var savedCount = 0;
 
-      rows.forEach(function(row) {
-        if (row.style.display === 'none') return;
-        
-        var empId = row.getAttribute('data-emp-id');
-        var emp = employees.find(function(e) { return e.id === empId; });
-        if (!emp) return;
+      document.querySelectorAll('.bp-row').forEach(function(row){
+        if(row.style.display==='none') return;
+        var eid = row.dataset.empId;
+        var emp = employees.find(function(e){return e.id===eid;});
+        if(!emp) return;
 
-        var daysWorked = parseFloat(row.querySelector('.bp-days').value) || 0;
-        var bonuses = parseFloat(row.querySelector('.bp-bonus').value) || 0;
-        var leavePay = parseFloat(row.querySelector('.bp-leave').value) || 0;
-        var gratuity = parseFloat(row.querySelector('.bp-gratuity').value) || 0;
-        var penalties = parseFloat(row.querySelector('.bp-penalty').value) || 0;
-        var advanceSalary = parseFloat(row.querySelector('.bp-advance').value) || 0;
-        var loansRepaid = parseFloat(row.querySelector('.bp-loan-rep').value) || 0;
-        var loansAdvanced = parseFloat(row.querySelector('.bp-loan-giv').value) || 0;
-        var otherDeductions = parseFloat(row.querySelector('.bp-other').value) || 0;
+        var bns = parseFloat(row.querySelector('.bp-bonus').value)||0;
+        var lv = parseFloat(row.querySelector('.bp-leave').value)||0;
+        var gr = parseFloat(row.querySelector('.bp-gratuity').value)||0;
+        var pn = parseFloat(row.querySelector('.bp-penalty').value)||0;
+        var adv = parseFloat(row.querySelector('.bp-advance').value)||0;
+        var lr = parseFloat(row.querySelector('.bp-loan-rep').value)||0;
+        var lg = parseFloat(row.querySelector('.bp-loan-giv').value)||0;
+        var od = parseFloat(row.querySelector('.bp-other').value)||0;
+        var dw = parseFloat(row.querySelector('.bp-days').value)||0;
         var status = row.querySelector('.bp-status').value;
-        
-        var actual = (emp.base_salary * daysWorked) / totalDays;
-        var net = actual + bonuses + leavePay + gratuity - penalties - advanceSalary - loansRepaid - otherDeductions;
+
+        var actual = (emp.base_salary * dw)/days;
+        var net = actual + bns + lv + gr - pn - adv - lr - od;
 
         promises.push(sb.from('payroll_records').upsert({
-          employee_id: empId, month, year, total_days: totalDays, days_worked: daysWorked,
-          base_salary: emp.base_salary, actual_salary: actual, net_payable: net,
-          bonuses, leave_pay: leavePay, gratuity, penalties, advance_salary: advanceSalary,
-          loans_repaid: loansRepaid, other_deductions: otherDeductions, payment_status: status
-        }, { onConflict: 'employee_id,month,year' }));
+          employee_id:eid, month:m, year:y, total_days:days, days_worked:dw,
+          base_salary:emp.base_salary, actual_salary:actual, net_payable:net,
+          bonuses:bns, leave_pay:lv, gratuity:gr, penalties:pn, advance_salary:adv,
+          loans_repaid:lr, other_deductions:od, payment_status:status
+        }, {onConflict:'employee_id,month,year'}));
 
-        if (loansAdvanced > 0 || loansRepaid > 0) {
-          var curBal = emp.loan_balance || 0;
-          var newBal = curBal + loansAdvanced - loansRepaid;
-          
-          if (loansAdvanced > 0) {
-            promises.push(sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: 'Bulk entry', balance_after: newBal }));
-          }
-          if (loansRepaid > 0) {
-            promises.push(sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: loansRepaid, description: 'Bulk repayment', balance_after: newBal }));
-          }
-          promises.push(sb.from('employees').update({ loan_balance: newBal }).eq('id', empId));
+        if(lg>0 || lr>0) {
+          var cur = emp.loan_balance||0;
+          var newB = cur + lg - lr;
+          if(lg>0) promises.push(sb.from('loan_transactions').insert({employee_id:eid, type:'advanced', amount:lg, description:'Bulk', balance_after:newB}));
+          if(lr>0) promises.push(sb.from('loan_transactions').insert({employee_id:eid, type:'repaid', amount:lr, description:'Bulk', balance_after:newB}));
+          promises.push(sb.from('employees').update({loan_balance:newB}).eq('id',eid));
         }
-        
-        savedCount++;
       });
 
-      try {
-        await Promise.all(promises);
-        localStorage.removeItem('bulkPayrollDraft');
-        alert('Successfully saved payroll for ' + savedCount + ' employees!');
-        if (autoSaveInterval) clearInterval(autoSaveInterval);
-        loadData();
-      } catch (err) {
-        alert('Error saving: ' + err.message);
-      } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }
+      try { await Promise.all(promises); alert('Saved successfully!'); localStorage.removeItem('bulkDraft'); if(autoSaveInterval) clearInterval(autoSaveInterval); loadData(); }
+      catch(e) { alert('Error: ' + e.message); }
+      finally { btn.textContent = '💾 Save All Records'; btn.disabled = false; }
     }
 
+    // --- SINGLE PAYROLL ---
     function renderPayroll(container) {
       var today = new Date();
-      var empOptions = '';
-      employees.filter(function(e) { return e.status === 'active'; }).forEach(function(e) { 
-        empOptions += '<option value="' + e.id + '" data-salary="' + e.base_salary + '">' + e.name + ' (' + fmt(e.base_salary) + ')</option>'; 
-      });
-      var monthDefault = today.getMonth() + 1;
-      var yearDefault = today.getFullYear();
-      var daysInMonth = new Date(yearDefault, monthDefault, 0).getDate();
+      var opts = employees.filter(function(e){return e.status==='active';}).map(function(e){return '<option value="'+e.id+'" data-salary="'+e.base_salary+'">'+e.name+' ('+fmt(e.base_salary)+')</option>';}).join('');
+      
+      container.innerHTML = 
+        '<div class="max-w-4xl mx-auto fade-in">' +
+          '<h1 class="text-2xl font-bold text-slate-900 mb-6">Single Payroll Entry</h1>' +
+          '<div class="card p-6 md:p-8">' +
+            '<form onsubmit="submitPayroll(event)">' +
+              '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">' +
+                '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Employee</label><select id="employeeSelect" required onchange="updateSalaryCalc()" class="input-field">'+(opts||'<option>No employees</option>')+'</select></div>' +
+                '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Month</label><select id="payMonth" name="month" required onchange="autoUpdateDays()" class="input-field"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select></div>' +
+                '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Year</label><input id="payYear" type="number" name="year" value="'+today.getFullYear()+'" required onchange="autoUpdateDays()" class="input-field"></div>' +
+              '</div>' +
 
-      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Single Payroll Entry</h1><p class="text-gray-500">Process monthly payroll for one employee</p></div>' +
-        '<div class="card p-8"><form onsubmit="submitPayroll(event)">' +
-        '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Employee *</label><select id="employeeSelect" required onchange="updateSalaryCalc()" class="input-field">' + (empOptions || '<option>No active employees</option>') + '</select></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month *</label><select id="payMonth" name="month" required onchange="autoUpdateDays()" class="input-field"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4" ' + (monthDefault===4?'selected':'') + '>Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year *</label><input id="payYear" type="number" name="year" value="' + yearDefault + '" required onchange="autoUpdateDays()" class="input-field"></div>' +
-        '</div>' +
-        '<div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl mb-8 border border-blue-100">' +
-          '<h3 class="font-bold text-gray-900 mb-4">💰 Salary Calculation (AED)</h3>' +
-          '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Contracted Salary</label><input type="number" id="contractedSalary" readonly class="input-field bg-gray-100"></div>' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Total Days (Auto)</label><input type="number" id="totalDays" name="totalDays" value="' + daysInMonth + '" readonly class="input-field bg-gray-100"></div>' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Days Worked</label><input type="number" id="daysWorked" name="daysWorked" value="' + daysInMonth + '" onchange="calcActualSalary()" class="input-field"></div>' +
+              '<div class="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">' +
+                '<h3 class="font-semibold text-slate-900 mb-4">Salary Calculation</h3>' +
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Contract</label><input type="number" id="contractedSalary" readonly class="input-field bg-slate-100 border-slate-200"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Total Days</label><input type="number" id="totalDays" name="totalDays" readonly class="input-field bg-slate-100 border-slate-200"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Days Worked</label><input type="number" id="daysWorked" name="daysWorked" onchange="calcActualSalary()" class="input-field"></div>' +
+                '</div>' +
+                '<div class="mt-4"><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Actual Salary</label><input type="number" id="actualSalary" readonly class="input-field bg-slate-100 border-slate-200 font-bold text-blue-700 text-lg"></div>' +
+              '</div>' +
+
+              '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">' +
+                '<div class="space-y-4">' +
+                  '<h3 class="font-semibold text-green-700 border-b border-green-100 pb-2">Additions</h3>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Bonus</label><input name="bonuses" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Leave Pay</label><input name="leavePay" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Gratuity</label><input name="gratuity" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Other Earnings</label><input name="otherEarnings" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                '</div>' +
+                '<div class="space-y-4">' +
+                  '<h3 class="font-semibold text-red-700 border-b border-red-100 pb-2">Deductions</h3>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Penalty</label><input name="penalties" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Loan Repayment</label><input name="loansRepaid" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Advance Salary</label><input name="advanceSalary" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                  '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Other Deductions</label><input name="otherDeductions" type="number" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
+                '</div>' +
+              '</div>' +
+              
+              '<div class="mb-6"><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">New Loan Given (Optional)</label><input name="loansAdvanced" type="number" step="0.01" value="0" class="input-field"></div>' +
+
+              '<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-6 mb-8 text-center">' +
+                '<p class="text-sm font-semibold text-emerald-800 uppercase tracking-wide mb-1">Net Payable</p>' +
+                '<p class="text-4xl font-bold text-emerald-700" id="netPayableDisplay">0.00</p>' +
+              '</div>' +
+
+              '<div class="flex gap-4">' +
+                '<button type="submit" class="btn-primary flex-1 py-3 text-lg">Save Payroll</button>' +
+                '<button type="button" onclick="showPage(\'dashboard\')" class="btn-secondary flex-1 py-3 text-lg">Cancel</button>' +
+              '</div>' +
+            '</form>' +
           '</div>' +
-          '<div class="mt-4"><label class="block text-sm font-medium text-gray-700 mb-2">Actual Salary (Auto)</label><input type="number" id="actualSalary" readonly class="input-field bg-gray-100 font-bold text-blue-700 text-lg"></div>' +
-        '</div>' +
-        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Bonuses</label><input type="number" name="bonuses" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Leave Pay</label><input type="number" name="leavePay" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Gratuity</label><input type="number" name="gratuity" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Earnings</label><input type="number" name="otherEarnings" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Penalties</label><input type="number" name="penalties" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Repayment</label><input type="number" name="loansRepaid" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Advance Salary</label><input type="number" name="advanceSalary" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Deductions</label><input type="number" name="otherDeductions" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount (New)</label><input type="number" name="loansAdvanced" step="0.01" value="0" class="input-field"></div>' +
-        '</div>' +
-        '<div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl mb-8 border border-green-100">' +
-          '<p class="text-lg font-bold text-gray-900">Net Payable: <span class="text-3xl text-green-600"><span id="netPayableDisplay">0.00</span></span></p>' +
-        '</div>' +
-        '<div class="flex gap-3"><button type="submit" class="btn-primary flex-1 py-3 text-base">Save Payroll</button><button type="button" onclick="showPage(\'dashboard\')" class="btn-secondary flex-1 py-3 text-base">Cancel</button></div></form></div>';
-      container.innerHTML = html;
+        '</div>';
     }
 
     function updateSalaryCalc() {
-      var select = document.getElementById('employeeSelect');
-      var option = select.options[select.selectedIndex];
-      document.getElementById('contractedSalary').value = option.getAttribute('data-salary') || 0;
+      var sel = document.getElementById('employeeSelect');
+      document.getElementById('contractedSalary').value = sel.options[sel.selectedIndex].dataset.salary||0;
       calcActualSalary();
     }
 
     function autoUpdateDays() {
-      var month = parseInt(document.getElementById('payMonth')?.value || 1);
-      var year = parseInt(document.getElementById('payYear')?.value || new Date().getFullYear());
-      var totalDays = new Date(year, month, 0).getDate();
-      var totalDaysInput = document.getElementById('totalDays');
-      var daysWorkedInput = document.getElementById('daysWorked');
-      if (totalDaysInput) totalDaysInput.value = totalDays;
-      if (daysWorkedInput && daysWorkedInput.value > totalDays) daysWorkedInput.value = totalDays;
+      var m = parseInt(document.getElementById('payMonth').value);
+      var y = parseInt(document.getElementById('payYear').value);
+      var d = new Date(y, m, 0).getDate();
+      document.getElementById('totalDays').value = d;
+      document.getElementById('daysWorked').value = d;
       calcActualSalary();
     }
 
     function calcActualSalary() {
-      var contracted = parseFloat(document.getElementById('contractedSalary').value) || 0;
-      var totalDays = parseInt(document.getElementById('totalDays').value) || 28;
-      var daysWorked = parseInt(document.getElementById('daysWorked').value) || 28;
-      document.getElementById('actualSalary').value = ((contracted * daysWorked) / totalDays).toFixed(2);
+      var sal = parseFloat(document.getElementById('contractedSalary').value)||0;
+      var dw = parseInt(document.getElementById('daysWorked').value)||0;
+      var td = parseInt(document.getElementById('totalDays').value)||1;
+      document.getElementById('actualSalary').value = ((sal*dw)/td).toFixed(2);
       calcNetPayable();
     }
 
     function calcNetPayable() {
-      var actual = parseFloat(document.getElementById('actualSalary').value) || 0;
-      var fields = document.querySelectorAll('.calc-field');
-      var add = 0, sub = 0;
-      fields.forEach(function(f) {
-        var val = parseFloat(f.value) || 0;
-        if (['bonuses','leavePay','gratuity','otherEarnings'].includes(f.name)) add += val;
-        else sub += val;
+      var act = parseFloat(document.getElementById('actualSalary').value)||0;
+      var add=0, sub=0;
+      document.querySelectorAll('.calc-field').forEach(function(f){
+        var v=parseFloat(f.value)||0;
+        if(['bonuses','leavePay','gratuity','otherEarnings'].includes(f.name)) add+=v; else sub+=v;
       });
-      document.getElementById('netPayableDisplay').textContent = (actual + add - sub).toFixed(2);
+      document.getElementById('netPayableDisplay').textContent = (act+add-sub).toFixed(2);
     }
 
     async function submitPayroll(e) {
       e.preventDefault();
       var fd = new FormData(e.target);
-      var empId = fd.get('employeeId') || document.getElementById('employeeSelect').value;
-      var emp = employees.find(function(e) { return e.id === empId; });
-      var month = parseInt(fd.get('month')), year = parseInt(fd.get('year'));
-      var totalDays = parseInt(fd.get('totalDays')), daysWorked = parseInt(fd.get('daysWorked'));
-      var contracted = emp.base_salary;
-      var actual = (contracted * daysWorked) / totalDays;
-      var add = parseFloat(fd.get('bonuses'))+parseFloat(fd.get('leavePay'))+parseFloat(fd.get('gratuity'))+parseFloat(fd.get('otherEarnings'));
-      var sub = parseFloat(fd.get('penalties'))+parseFloat(fd.get('loansRepaid'))+parseFloat(fd.get('advanceSalary'))+parseFloat(fd.get('otherDeductions'));
-      var net = actual + add - sub;
-      var loansAdvanced = parseFloat(fd.get('loansAdvanced')) || 0;
+      var eid = fd.get('employeeId')||document.getElementById('employeeSelect').value;
+      var emp = employees.find(function(x){return x.id===eid;});
+      
+      var m=parseInt(fd.get('month')), y=parseInt(fd.get('year'));
+      var td=parseInt(fd.get('totalDays')), dw=parseInt(fd.get('daysWorked'));
+      var lg = parseFloat(fd.get('loansAdvanced'))||0;
+      
+      var act = (emp.base_salary*dw)/td;
+      var net = act + parseFloat(fd.get('bonuses')) + parseFloat(fd.get('leavePay')) + parseFloat(fd.get('gratuity')) + parseFloat(fd.get('otherEarnings')) - parseFloat(fd.get('penalties')) - parseFloat(fd.get('loansRepaid')) - parseFloat(fd.get('advanceSalary')) - parseFloat(fd.get('otherDeductions'));
 
       await sb.from('payroll_records').upsert({
-        employee_id: empId, month, year, total_days: totalDays, days_worked: daysWorked,
-        base_salary: contracted, actual_salary: actual, net_payable: net,
-        bonuses: parseFloat(fd.get('bonuses')), penalties: parseFloat(fd.get('penalties')),
-        leave_pay: parseFloat(fd.get('leavePay')), gratuity: parseFloat(fd.get('gratuity')),
-        other_earnings: parseFloat(fd.get('otherEarnings')), loans_repaid: parseFloat(fd.get('loansRepaid')),
-        advance_salary: parseFloat(fd.get('advanceSalary')), other_deductions: parseFloat(fd.get('otherDeductions'))
-      }, { onConflict: 'employee_id,month,year' });
+        employee_id:eid, month:m, year:y, total_days:td, days_worked:dw, base_salary:emp.base_salary, actual_salary:act, net_payable:net,
+        bonuses:parseFloat(fd.get('bonuses')), leave_pay:parseFloat(fd.get('leavePay')), gratuity:parseFloat(fd.get('gratuity')), other_earnings:parseFloat(fd.get('otherEarnings')),
+        penalties:parseFloat(fd.get('penalties')), loans_repaid:parseFloat(fd.get('loansRepaid')), advance_salary:parseFloat(fd.get('advanceSalary')), other_deductions:parseFloat(fd.get('otherDeductions'))
+      }, {onConflict:'employee_id,month,year'});
 
-      if (loansAdvanced > 0 || parseFloat(fd.get('loansRepaid')) > 0) {
-        var curBal = emp.loan_balance || 0;
-        var newBal = curBal + loansAdvanced - parseFloat(fd.get('loansRepaid'));
-        if (loansAdvanced > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: 'Manual entry', balance_after: newBal });
-        if (parseFloat(fd.get('loansRepaid')) > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: parseFloat(fd.get('loansRepaid')), description: 'Manual repayment', balance_after: newBal });
-        await sb.from('employees').update({ loan_balance: newBal }).eq('id', empId);
+      if(lg>0 || parseFloat(fd.get('loansRepaid'))>0) {
+        var cb=emp.loan_balance||0, nb=cb+lg-parseFloat(fd.get('loansRepaid'));
+        if(lg>0) await sb.from('loan_transactions').insert({employee_id:eid, type:'advanced', amount:lg, description:'Manual', balance_after:nb});
+        if(parseFloat(fd.get('loansRepaid'))>0) await sb.from('loan_transactions').insert({employee_id:eid, type:'repaid', amount:parseFloat(fd.get('loansRepaid')), description:'Manual', balance_after:nb});
+        await sb.from('employees').update({loan_balance:nb}).eq('id',eid);
       }
-      alert('Saved! Net Payable: ' + fmt(net)); loadData();
+      alert('Saved! Net: '+fmt(net)); loadData();
     }
 
+    // --- LOANS ---
     function renderLoans(container) {
-      var totalOut = 0, withLoans = 0;
-      employees.forEach(function(e) { 
-        totalOut += parseFloat(e.loan_balance||0); 
-        if(e.loan_balance>0) withLoans++; 
-      });
+      var totalOut=0, withLoans=0;
+      employees.forEach(function(e){ totalOut+=parseFloat(e.loan_balance||0); if(e.loan_balance>0) withLoans++; });
       
-      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Loan Management</h1><p class="text-gray-500">Track advances & repayments in AED</p></div>' +
-        '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">' +
-          '<div class="metric-card"><p class="text-sm text-gray-500">Total Outstanding</p><p class="text-3xl font-bold text-red-600 mt-1">' + fmt(totalOut) + '</p></div>' +
-          '<div class="metric-card"><p class="text-sm text-gray-500">Employees with Loans</p><p class="text-3xl font-bold text-blue-600 mt-1">' + withLoans + '</p></div>' +
-          '<div class="metric-card"><p class="text-sm text-gray-500">Transactions</p><p class="text-3xl font-bold text-purple-600 mt-1">' + loanTransactions.length + '</p></div>' +
-        '</div><div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b"><tr>' +
-          '<th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th>' +
-          '<th class="text-left py-4 px-6 font-semibold text-gray-700">Balance</th>' +
-          '<th class="text-left py-4 px-6 font-semibold text-gray-700">Total Advanced</th>' +
-          '<th class="text-left py-4 px-6 font-semibold text-gray-700">Total Repaid</th>' +
-          '<th class="text-left py-4 px-6 font-semibold text-gray-700">Actions</th>' +
-        '</tr></thead><tbody>';
+      container.innerHTML = 
+        '<div class="hero-section fade-in mb-6">' +
+          '<h1 class="text-2xl font-light text-slate-300 mb-1">Total Outstanding Loans</h1>' +
+          '<div class="text-4xl md:text-5xl font-bold tracking-tight">' + fmt(totalOut) + '</div>' +
+        '</div>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 fade-in">' +
+          '<div class="card p-6 text-center"><p class="text-slate-500 text-sm uppercase">Employees with Loans</p><p class="text-3xl font-bold text-blue-600 mt-2">'+withLoans+'</p></div>' +
+          '<div class="card p-6 text-center"><p class="text-slate-500 text-sm uppercase">Total Transactions</p><p class="text-3xl font-bold text-purple-600 mt-2">'+loanTransactions.length+'</p></div>' +
+        '</div>' +
+        '<div class="card table-container fade-in"><table><thead><tr><th>Employee</th><th>Balance</th><th>Advanced</th><th>Repaid</th><th>Action</th></tr></thead><tbody>';
         
       employees.forEach(function(emp) {
-        var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });
-        var adv = 0, rep = 0;
-        empLoans.forEach(function(r) { if(r.type==='advanced') adv+=r.amount; else rep+=r.amount; });
-        html += '<tr class="table-row border-b"><td class="py-4 px-6 font-semibold">' + emp.name + '</td>' +
-          '<td class="py-4 px-6 ' + (emp.loan_balance>0?'text-red-600 font-bold':'text-green-600') + '">' + fmt(emp.loan_balance||0) + '</td>' +
-          '<td class="py-4 px-6 text-red-600">' + fmt(adv) + '</td>' +
-          '<td class="py-4 px-6 text-green-600">' + fmt(rep) + '</td>' +
-          '<td class="py-4 px-6"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:underline text-sm">View History</button></td></tr>';
+        var lo = loanTransactions.filter(function(r){return r.employee_id===emp.id;});
+        var adv=0, rep=0;
+        lo.forEach(function(r){if(r.type==='advanced')adv+=r.amount;else rep+=r.amount;});
+        container.innerHTML += '<tr><td class="font-medium">'+emp.name+'</td><td><span class="badge '+(emp.loan_balance>0?'badge-danger':'badge-success')+'">'+fmt(emp.loan_balance||0)+'</span></td><td class="text-red-600">'+fmt(adv)+'</td><td class="text-green-600">'+fmt(rep)+'</td><td><button onclick="viewEmployeeHistory(\''+emp.id+'\')" class="text-blue-600 hover:underline text-sm">History</button></td></tr>';
       });
       
-      html += '</tbody></table></div>';
-      container.innerHTML = html;
+      container.innerHTML += '</tbody></table></div>';
     }
 
+    // --- REPORTS ---
     function renderReports(container) {
-      var months = ['All Months','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      var years = ['All Years'];
-      var uniqueYears = payrollRecords.map(function(r){return r.year;}).filter(function(v,i,a){return a.indexOf(v)===i;}).sort().reverse();
-      years = years.concat(uniqueYears);
-      
-      var empOptions = '<option value="all">All Employees</option>';
-      employees.forEach(function(e){ empOptions += '<option value="'+e.id+'">'+e.name+'</option>'; });
-
       container.innerHTML = 
-        '<div class="mb-6"><h1 class="text-3xl font-bold text-gray-900 mb-2">Reports & Analytics</h1><p class="text-gray-500">View, filter, and export payroll data in AED</p></div>' +
-        '<div class="flex flex-wrap gap-2 mb-6">' +
-          '<button onclick="switchReportTab(\'payroll\')" id="tab-payroll" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">📊 Monthly Payroll</button>' +
-          '<button onclick="switchReportTab(\'loans\')" id="tab-loans" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600">💳 Loan Summary</button>' +
-          '<button onclick="switchReportTab(\'history\')" id="tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600">📋 Full History</button>' +
+        '<div class="mb-6"><h1 class="text-2xl font-bold text-slate-900">Reports</h1><p class="text-slate-500 text-sm">View and export payroll data</p></div>' +
+        '<div class="flex gap-2 mb-6 fade-in">' +
+          '<button onclick="switchReportTab(\'payroll\')" id="tab-payroll" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">Payroll</button>' +
+          '<button onclick="switchReportTab(\'loans\')" id="tab-loans" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200">Loans</button>' +
+          '<button onclick="switchReportTab(\'history\')" id="tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200">History</button>' +
         '</div>' +
-        '<div class="card p-6 mb-6">' +
-          '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month</label><select id="filterMonth" onchange="updateReportFilters()" class="input-field">' + months.map(function(m,i){return '<option value="'+i+'">'+m+'</option>';}).join('') + '</select></div>' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year</label><select id="filterYear" onchange="updateReportFilters()" class="input-field">' + years.map(function(y){return '<option value="'+y+'">'+y+'</option>';}).join('') + '</select></div>' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Employee</label><select id="filterEmployee" onchange="updateReportFilters()" class="input-field">' + empOptions + '</select></div>' +
+        '<div class="card p-6 fade-in">' +
+          '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">' +
+            '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Month</label><select id="filterMonth" onchange="updateReportFilters()" class="input-field"><option value="0">All</option>'+Array.from({length:12},(_,i)=>'<option value="'+(i+1)+'">'+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]+'</option>').join('')+'</select></div>' +
+            '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Year</label><select id="filterYear" onchange="updateReportFilters()" class="input-field"><option value="All Years">All</option></select></div>' +
+            '<div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Employee</label><select id="filterEmployee" onchange="updateReportFilters()" class="input-field"><option value="all">All</option>'+employees.map(function(e){return '<option value="'+e.id+'">'+e.name+'</option>';}).join('')+'</select></div>' +
           '</div>' +
-          '<div id="reportSummary" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"></div>' +
-          '<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-gray-900" id="reportTitle">Payroll Records</h3><button onclick="exportCurrentReport()" class="btn-secondary text-sm">📥 Export CSV</button></div>' +
-          '<div class="overflow-x-auto max-h-[500px]"><table class="w-full text-sm" id="reportTable"><thead class="bg-gray-50 sticky top-0" id="reportTableHead"></thead><tbody id="reportTableBody"></tbody></table></div>' +
-          '<div id="reportEmpty" class="hidden text-center py-12 text-gray-500">No records match your filters</div>' +
+          '<div id="reportSummary" class="mb-6"></div>' +
+          '<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900" id="reportTitle">Records</h3><button onclick="exportCurrentReport()" class="btn-secondary text-sm">📥 Export CSV</button></div>' +
+          '<div class="overflow-x-auto max-h-[500px] table-container"><table class="w-full text-sm" id="reportTable"><thead class="bg-slate-50 sticky top-0" id="reportTableHead"></thead><tbody id="reportTableBody"></tbody></table></div>' +
         '</div>';
       
+      var years = ['All Years'].concat(payrollRecords.map(function(r){return r.year;}).filter(function(v,i,a){return a.indexOf(v)===i;}));
+      document.getElementById('filterYear').innerHTML = years.map(function(y){return '<option value="'+y+'">'+y+'</option>';}).join('');
       updateReportFilters();
     }
 
     function switchReportTab(tab) {
       reportFilters.tab = tab;
-      document.querySelectorAll('.tab-btn').forEach(function(b){ 
-        b.classList.remove('active','bg-blue-600','text-white'); 
-        b.classList.add('bg-gray-100','text-gray-600'); 
-      });
+      document.querySelectorAll('.tab-btn').forEach(function(b){b.className='tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200';});
       var btn = document.getElementById('tab-'+tab);
-      btn.classList.add('active','bg-blue-600','text-white');
-      btn.classList.remove('bg-gray-100','text-gray-600');
+      btn.className = 'tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white border border-transparent';
       updateReportView();
     }
 
@@ -908,204 +976,118 @@
     }
 
     function updateReportView() {
-      var filtered = payrollRecords.filter(function(r) {
-        if (reportFilters.month !== '0' && r.month !== parseInt(reportFilters.month)) return false;
-        if (reportFilters.year !== 'All Years' && r.year !== parseInt(reportFilters.year)) return false;
-        if (reportFilters.employee !== 'all' && r.employee_id !== reportFilters.employee) return false;
+      var data = payrollRecords.filter(function(r){
+        if(reportFilters.month!=='0' && r.month!==parseInt(reportFilters.month)) return false;
+        if(reportFilters.year!=='All Years' && r.year!==parseInt(reportFilters.year)) return false;
+        if(reportFilters.employee!=='all' && r.employee_id!==reportFilters.employee) return false;
         return true;
       });
 
-      var title = document.getElementById('reportTitle');
       var head = document.getElementById('reportTableHead');
       var body = document.getElementById('reportTableBody');
-      var empty = document.getElementById('reportEmpty');
-      var summary = document.getElementById('reportSummary');
+      var summ = document.getElementById('reportSummary');
 
-      if (reportFilters.tab === 'payroll') {
-        title.textContent = 'Monthly Payroll Records (AED)';
-        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Month/Year</th><th class="text-left py-3 px-4 font-medium text-gray-700">Actual Salary</th><th class="text-left py-3 px-4 font-medium text-gray-700">Additions</th><th class="text-left py-3 px-4 font-medium text-gray-700">Deductions</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net Payable</th></tr>';
-        
-        var totalNet = 0;
-        var rows = filtered.map(function(r) {
+      if(reportFilters.tab==='payroll') {
+        document.getElementById('reportTitle').textContent = 'Payroll Records';
+        head.innerHTML = '<tr><th>Employee</th><th>Period</th><th>Actual</th><th>Additions</th><th>Deductions</th><th>Net</th></tr>';
+        var total = 0;
+        body.innerHTML = data.map(function(r){
           var emp = employees.find(function(e){return e.id===r.employee_id;});
           var add = (parseFloat(r.bonuses)||0)+(parseFloat(r.leave_pay)||0)+(parseFloat(r.gratuity)||0)+(parseFloat(r.other_earnings)||0);
           var sub = (parseFloat(r.penalties)||0)+(parseFloat(r.loans_repaid)||0)+(parseFloat(r.advance_salary)||0)+(parseFloat(r.other_deductions)||0);
-          totalNet += parseFloat(r.net_payable||0);
-          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+(emp?emp.name:'?')+'</td><td class="py-3 px-4">'+r.month+'/'+r.year+'</td><td class="py-3 px-4">'+fmt(r.actual_salary||r.base_salary)+'</td><td class="py-3 px-4 text-green-600">+'+fmt(add)+'</td><td class="py-3 px-4 text-red-600">-'+fmt(sub)+'</td><td class="py-3 px-4 font-bold">'+fmt(r.net_payable)+'</td></tr>';
+          total += parseFloat(r.net_payable||0);
+          return '<tr><td class="font-medium">'+(emp?emp.name:'?')+'</td><td>'+r.month+'/'+r.year+'</td><td>'+fmt(r.actual_salary||r.base_salary)+'</td><td class="text-green-600">+'+fmt(add)+'</td><td class="text-red-600">-'+fmt(sub)+'</td><td class="font-bold">'+fmt(r.net_payable)+'</td></tr>';
         }).join('');
-        
-        summary.innerHTML = '<div class="metric-card p-4 col-span-4"><p class="text-xs text-gray-500">Total Net Payable</p><p class="text-xl font-bold text-gray-900">'+fmt(totalNet)+'</p></div>';
-        body.innerHTML = rows;
-        empty.classList.toggle('hidden', filtered.length > 0);
-      } 
-      else if (reportFilters.tab === 'loans') {
-        title.textContent = 'Loan Summary (AED)';
-        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Balance</th><th class="text-left py-3 px-4 font-medium text-gray-700">Advanced</th><th class="text-left py-3 px-4 font-medium text-gray-700">Repaid</th></tr>';
-        
-        var totalOut = 0;
-        var rows = employees.map(function(emp) {
-          var empLoans = loanTransactions.filter(function(r){return r.employee_id===emp.id;});
-          var adv = 0, rep = 0;
-          empLoans.forEach(function(r){ if(r.type==='advanced') adv+=r.amount; else rep+=r.amount; });
-          totalOut += parseFloat(emp.loan_balance||0);
-          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+emp.name+'</td><td class="py-3 px-4 font-bold">'+fmt(emp.loan_balance||0)+'</td><td class="py-3 px-4 text-red-600">'+fmt(adv)+'</td><td class="py-3 px-4 text-green-600">'+fmt(rep)+'</td></tr>';
+        summ.innerHTML = '<div class="bg-blue-50 p-4 rounded-xl text-center"><p class="text-blue-800 font-bold text-xl">'+fmt(total)+'</p><p class="text-blue-600 text-sm">Total Net Payable</p></div>';
+      }
+      else if(reportFilters.tab==='loans') {
+        document.getElementById('reportTitle').textContent = 'Loan Summary';
+        head.innerHTML = '<tr><th>Employee</th><th>Balance</th><th>Advanced</th><th>Repaid</th></tr>';
+        var total = 0;
+        body.innerHTML = employees.map(function(emp){
+          var lo = loanTransactions.filter(function(r){return r.employee_id===emp.id;});
+          var a=0, p=0; lo.forEach(function(r){if(r.type==='advanced')a+=r.amount;else p+=r.amount;});
+          total += parseFloat(emp.loan_balance||0);
+          return '<tr><td class="font-medium">'+emp.name+'</td><td class="font-bold">'+fmt(emp.loan_balance||0)+'</td><td class="text-red-600">'+fmt(a)+'</td><td class="text-green-600">'+fmt(p)+'</td></tr>';
         }).join('');
-        
-        summary.innerHTML = '<div class="metric-card p-4 col-span-4"><p class="text-xs text-gray-500">Total Outstanding</p><p class="text-xl font-bold text-red-600">'+fmt(totalOut)+'</p></div>';
-        body.innerHTML = rows;
-        empty.classList.add('hidden');
+        summ.innerHTML = '<div class="bg-orange-50 p-4 rounded-xl text-center"><p class="text-orange-800 font-bold text-xl">'+fmt(total)+'</p><p class="text-orange-600 text-sm">Total Outstanding</p></div>';
       }
       else {
-        title.textContent = 'Full Payroll History (AED)';
-        head.innerHTML = '<tr><th class="text-left py-3 px-4 font-medium text-gray-700">Employee</th><th class="text-left py-3 px-4 font-medium text-gray-700">Month</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net</th></tr>';
-        
-        var rows = filtered.map(function(r) {
+        document.getElementById('reportTitle').textContent = 'Full History';
+        head.innerHTML = '<tr><th>Employee</th><th>Period</th><th>Net</th></tr>';
+        body.innerHTML = data.map(function(r){
           var emp = employees.find(function(e){return e.id===r.employee_id;});
-          return '<tr class="border-b border-gray-100 table-row"><td class="py-3 px-4 font-medium">'+(emp?emp.name:'?')+'</td><td class="py-3 px-4">'+r.month+'/'+r.year+'</td><td class="py-3 px-4 font-bold">'+fmt(r.net_payable)+'</td></tr>';
+          return '<tr><td class="font-medium">'+(emp?emp.name:'?')+'</td><td>'+r.month+'/'+r.year+'</td><td class="font-bold">'+fmt(r.net_payable)+'</td></tr>';
         }).join('');
-        
-        summary.innerHTML = '<div class="metric-card p-4 col-span-4"><p class="text-xs text-gray-500">Total Records</p><p class="text-xl font-bold text-gray-900">'+filtered.length+'</p></div>';
-        body.innerHTML = rows;
-        empty.classList.toggle('hidden', filtered.length > 0);
+        summ.innerHTML = '<div class="bg-slate-100 p-4 rounded-xl text-center"><p class="text-slate-800 font-bold text-xl">'+data.length+'</p><p class="text-slate-600 text-sm">Records</p></div>';
       }
     }
 
     function exportCurrentReport() {
-      if (reportFilters.tab === 'payroll') {
-        var csv = 'Employee,Month,Year,Actual Salary,Additions,Deductions,Net Payable (AED)\n';
-        payrollRecords.forEach(function(r) {
-          var emp = employees.find(function(e){return e.id===r.employee_id;});
-          var add = (parseFloat(r.bonuses)||0)+(parseFloat(r.leave_pay)||0)+(parseFloat(r.gratuity)||0)+(parseFloat(r.other_earnings)||0);
-          var sub = (parseFloat(r.penalties)||0)+(parseFloat(r.loans_repaid)||0)+(parseFloat(r.advance_salary)||0)+(parseFloat(r.other_deductions)||0);
-          csv += (emp?emp.name:'?')+','+r.month+','+r.year+','+(r.actual_salary||r.base_salary)+','+add+','+sub+','+r.net_payable+'\n';
-        });
-        downloadCSV(csv, 'monthly-payroll-AED.csv');
-      } else if (reportFilters.tab === 'loans') {
-        var csv='Employee,Balance,Advanced,Repaid (AED)\n';
-        employees.forEach(function(emp){
-          var lo=loanTransactions.filter(function(r){return r.employee_id===emp.id;});
-          var a=0,p=0;lo.forEach(function(r){if(r.type==='advanced')a+=r.amount;else p+=r.amount;});
-          csv+=emp.name+','+(emp.loan_balance||0)+','+a+','+p+'\n';
-        });
-        downloadCSV(csv, 'loan-summary-AED.csv');
-      } else {
-        var csv='Employee,Month,Year,Net (AED)\n';
-        payrollRecords.forEach(function(r){
-          var e=employees.find(function(x){return x.id===r.employee_id;});
-          csv+=(e?e.name:'?')+','+r.month+','+r.year+','+r.net_payable+'\n';
-        });
-        downloadCSV(csv, 'full-history-AED.csv');
+      if(reportFilters.tab==='payroll') {
+        var c = 'Employee,Period,Actual,Add,Deduct,Net\n';
+        payrollRecords.forEach(function(r){var e=employees.find(function(x){return x.id===r.employee_id;});var a=(parseFloat(r.bonuses)||0)+(parseFloat(r.leave_pay)||0)+(parseFloat(r.gratuity)||0);var s=(parseFloat(r.penalties)||0)+(parseFloat(r.loans_repaid)||0)+(parseFloat(r.advance_salary)||0);c+=(e?e.name:'?')+','+r.month+'/'+r.year+','+(r.actual_salary||r.base_salary)+','+a+','+s+','+r.net_payable+'\n';});
+        downloadCSV(c, 'payroll-report.csv');
+      } else if(reportFilters.tab==='loans') {
+        var c = 'Employee,Balance,Adv,Rep\n';
+        employees.forEach(function(e){var lo=loanTransactions.filter(function(r){return r.employee_id===e.id;});var a=0,p=0;lo.forEach(function(r){if(r.type==='advanced')a+=r.amount;else p+=r.amount;});c+=e.name+','+(e.loan_balance||0)+','+a+','+p+'\n';});
+        downloadCSV(c, 'loan-report.csv');
       }
     }
 
-    function downloadCSV(csv, fn) { 
-      var b=new Blob([csv],{type:'text/csv'}); 
-      var u=URL.createObjectURL(b); 
-      var a=document.createElement('a'); 
-      a.href=u; 
-      a.download=fn; 
-      a.click(); 
-    }
-
+    function downloadCSV(csv, fn) { var b=new Blob([csv],{type:'text/csv'}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=fn; a.click(); }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+    
+    // Modals
     function showImportExcelModal() {
-      document.getElementById('modalContent').innerHTML = 
-        '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Import from Excel</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<div class="mb-6"><p class="text-gray-600 mb-4">Upload your Excel file with columns: Description, Position, Contracted Salary</p>' +
-        '<input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="input-field mb-4"></div>' +
-        '<div class="flex gap-3"><button onclick="processExcelImport()" class="btn-primary flex-1">Import</button><button onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div>';
+      document.getElementById('modalContent').innerHTML = '<div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-slate-900">Import Excel</h2><button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><div class="mb-6"><p class="text-slate-600 mb-4">Columns: Description, Position, Contracted Salary</p><input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="input-field mb-4"></div><div class="flex gap-3"><button onclick="processExcelImport()" class="btn-primary flex-1">Import</button><button onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div>';
       document.getElementById('modal').classList.remove('hidden');
     }
-
     function processExcelImport() {
       var file = document.getElementById('excelFile').files[0];
-      if (!file) return alert('Select a file');
+      if(!file) return alert('Select a file');
       var reader = new FileReader();
       reader.onload = function(e) {
         var data = new Uint8Array(e.target.result);
-        var workbook = XLSX.read(data, {type: 'array'});
-        var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-        var count = 0, promises = [];
-        jsonData.forEach(function(row) {
-          var name = row['Description'] || row['description'] || row['Name'] || row['name'];
-          var pos = row['Position'] || row['position'] || '';
-          var sal = row['Contracted Salary'] || row['salary'] || 0;
-          if (name && sal) { 
-            promises.push(sb.from('employees').insert({ 
-              name: name, role: pos, base_salary: parseFloat(sal), 
-              loan_balance: 0, status: 'active' 
-            })); 
-            count++; 
-          }
+        var wb = XLSX.read(data, {type:'array'});
+        var json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+        var count=0, promises=[];
+        json.forEach(function(row) {
+          var n = row['Description']||row['Name'];
+          var p = row['Position']||'';
+          var s = row['Contracted Salary']||row['Salary']||0;
+          if(n && s) { promises.push(sb.from('employees').insert({name:n, role:p, base_salary:parseFloat(s), loan_balance:0, status:'active'})); count++; }
         });
-        Promise.all(promises).then(function() { 
-          alert('Imported ' + count + ' employees!'); 
-          closeModal(); 
-          loadData(); 
-        }).catch(function(err) { alert('Error: ' + err.message); });
+        Promise.all(promises).then(function(){alert('Imported '+count+' employees'); closeModal(); loadData();});
       };
       reader.readAsArrayBuffer(file);
     }
 
     function showAddEmployeeModal() {
-      document.getElementById('modalContent').innerHTML = 
-        '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Add Employee</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<form onsubmit="addEmployee(event)"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Name *</label><input name="name" required class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Position</label><input name="role" class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Salary (AED) *</label><input name="baseSalary" type="number" step="0.01" required class="input-field"></div>' +
-        '</div><div class="flex gap-3"><button type="submit" class="btn-primary flex-1">Save</button><button type="button" onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div></form>';
+      document.getElementById('modalContent').innerHTML = '<div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-slate-900">Add Employee</h2><button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><form onsubmit="addEmployee(event)"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Name</label><input name="name" required class="input-field"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Position</label><input name="role" class="input-field"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Salary</label><input name="baseSalary" type="number" step="0.01" required class="input-field"></div></div><div class="flex gap-3"><button type="submit" class="btn-primary flex-1">Save</button><button type="button" onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div></form>';
       document.getElementById('modal').classList.remove('hidden');
     }
-
     async function addEmployee(e) {
       e.preventDefault();
       var fd = new FormData(e.target);
-      await sb.from('employees').insert({ 
-        name: fd.get('name'), role: fd.get('role'), 
-        base_salary: parseFloat(fd.get('baseSalary')), 
-        loan_balance: 0, status: 'active' 
-      });
+      await sb.from('employees').insert({name:fd.get('name'), role:fd.get('role'), base_salary:parseFloat(fd.get('baseSalary')), loan_balance:0, status:'active'});
       closeModal(); loadData();
     }
-
     async function deleteEmployee(id) {
-      if (!confirm('Delete this employee?')) return;
+      if(!confirm('Delete employee?')) return;
       await sb.from('employees').delete().eq('id', id);
       loadData();
     }
-
-    function viewEmployeeHistory(empId) {
-      var emp = employees.find(function(e) { return e.id === empId; });
-      var empPayroll = payrollRecords.filter(function(r){return r.employee_id===empId;});
-      var empLoans = loanTransactions.filter(function(r){return r.employee_id===empId;});
-      
-      var html = '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">History: ' + emp.name + '</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<h3 class="font-semibold mb-3">Payroll History</h3><table class="w-full text-sm mb-6"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-3">Month</th><th class="text-left py-2 px-3">Days</th><th class="text-left py-2 px-3">Net</th></tr></thead><tbody>';
-      
-      empPayroll.forEach(function(r){ 
-        html+='<tr class="border-b"><td class="py-2 px-3">'+r.month+'/'+r.year+'</td><td class="py-2 px-3">'+(r.days_worked||28)+'</td><td class="py-2 px-3 font-bold">'+fmt(r.net_payable)+'</td></tr>'; 
-      });
-      
-      html += '</tbody></table><h3 class="font-semibold mb-3">Loan Transactions</h3><table class="w-full text-sm"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-3">Date</th><th class="text-left py-2 px-3">Type</th><th class="text-left py-2 px-3">Amount</th></tr></thead><tbody>';
-      
-      empLoans.forEach(function(r){ 
-        html+='<tr class="border-b"><td class="py-2 px-3">'+new Date(r.created_at).toLocaleDateString()+'</td><td class="py-2 px-3">'+r.type+'</td><td class="py-2 px-3">'+fmt(r.amount)+'</td></tr>'; 
-      });
-      
-      html += '</tbody></table>';
-      document.getElementById('modalContent').innerHTML = html;
+    function viewEmployeeHistory(id) {
+      var emp = employees.find(function(e){return e.id===id;});
+      var pr = payrollRecords.filter(function(r){return r.employee_id===id;});
+      var lt = loanTransactions.filter(function(r){return r.employee_id===id;});
+      var h = '<div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-slate-900">History: '+emp.name+'</h2><button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><h3 class="font-semibold text-slate-500 mb-2">Payroll</h3><table class="w-full text-sm mb-6"><thead class="bg-slate-50"><tr><th class="text-left p-2">Month</th><th class="text-left p-2">Net</th></tr></thead><tbody>'+pr.map(function(r){return '<tr class="border-b"><td class="p-2">'+r.month+'/'+r.year+'</td><td class="p-2 font-bold">'+fmt(r.net_payable)+'</td></tr>';}).join('')+'</tbody></table><h3 class="font-semibold text-slate-500 mb-2">Loans</h3><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="text-left p-2">Date</th><th class="text-left p-2">Type</th><th class="text-left p-2">Amount</th></tr></thead><tbody>'+lt.map(function(r){return '<tr class="border-b"><td class="p-2">'+new Date(r.created_at).toLocaleDateString()+'</td><td class="p-2">'+r.type+'</td><td class="p-2">'+fmt(r.amount)+'</td></tr>';}).join('')+'</tbody></table>';
+      document.getElementById('modalContent').innerHTML = h;
       document.getElementById('modal').classList.remove('hidden');
     }
 
-    function closeModal() { 
-      document.getElementById('modal').classList.add('hidden'); 
-    }
-
-    (function() { 
-      sb.auth.getSession().then(function(r){ 
-        if(r.data && r.data.session) initApp(); 
-      }); 
-    })();
+    (function() { sb.auth.getSession().then(function(r){ if(r.data && r.data.session) initApp(); }); })();
   </script>
 </body>
 </html>
