@@ -7,30 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    .sidebar-item:hover { background: #f3f4f6; }
-    .sidebar-item.active { background: #dbeafe; color: #1e40af; }
-    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .input-field { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
-    .input-field:focus { outline: none; border-color: #3b82f6; ring: 2px solid #93c5fd; }
-    .btn-primary { background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-secondary { background: #f3f4f6; color: #374151; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; }
-    .btn-secondary:hover { background: #e5e7eb; }
-    .badge { padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
-    .badge-success { background: #d1fae5; color: #065f46; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
-    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
-    .table-row:hover { background: #f9fafb; }
-  </style>
 </head>
 <body class="bg-gray-50">
 
-  <!-- AUTH -->
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4">
-    <div class="card p-8 w-full max-w-md">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
       <h1 class="text-2xl font-bold text-center mb-2">🍽️ DesPardes Payroll Pro</h1>
       <p class="text-gray-500 text-center mb-6 text-sm">Professional Restaurant Payroll Management</p>
       
@@ -40,63 +21,47 @@
       </div>
 
       <form id="formSignIn" onsubmit="handleSignIn(event)">
-        <input type="email" id="inEmail" required placeholder="Email" class="input-field mb-3">
-        <input type="password" id="inPass" required placeholder="Password" class="input-field mb-4">
-        <button type="submit" class="btn-primary w-full">Sign In</button>
+        <input type="email" id="inEmail" required placeholder="Email" class="w-full px-4 py-2 border rounded-lg mb-3">
+        <input type="password" id="inPass" required placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4">
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold">Sign In</button>
       </form>
 
       <form id="formSignUp" class="hidden" onsubmit="handleSignUp(event)">
-        <input type="email" id="upEmail" required placeholder="Email" class="input-field mb-3">
-        <input type="password" id="upPass" required minlength="6" placeholder="Password (min 6)" class="input-field mb-3">
-        <input type="password" id="upPass2" required minlength="6" placeholder="Confirm Password" class="input-field mb-4">
-        <button type="submit" class="btn-primary w-full bg-green-600 hover:bg-green-700">Create Account</button>
+        <input type="email" id="upEmail" required placeholder="Email" class="w-full px-4 py-2 border rounded-lg mb-3">
+        <input type="password" id="upPass" required minlength="6" placeholder="Password (min 6)" class="w-full px-4 py-2 border rounded-lg mb-3">
+        <input type="password" id="upPass2" required minlength="6" placeholder="Confirm Password" class="w-full px-4 py-2 border rounded-lg mb-4">
+        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold">Create Account</button>
       </form>
 
       <div id="authMsg" class="mt-4 text-sm text-center hidden"></div>
     </div>
   </div>
 
-  <!-- MAIN APP -->
   <div id="appScreen" class="hidden">
     <div class="flex min-h-screen">
-      <!-- Sidebar -->
       <aside class="w-64 bg-white border-r border-gray-200 fixed h-full overflow-y-auto">
         <div class="p-6 border-b border-gray-200">
           <h2 class="text-xl font-bold">🍽️ DesPardes</h2>
           <p class="text-xs text-gray-500 mt-1">Payroll Pro</p>
         </div>
         <nav class="p-4 space-y-1">
-          <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-3" data-page="dashboard">
-            <span>📊</span> Dashboard
-          </button>
-          <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-3" data-page="employees">
-            <span>👥</span> Employees
-          </button>
-          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-3" data-page="payroll">
-            <span>💰</span> Payroll Entry
-          </button>
-          <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-3" data-page="loans">
-            <span>💳</span> Loan Management
-          </button>
-          <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-3" data-page="reports">
-            <span>📈</span> Reports
-          </button>
-          <button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-3 text-red-600 mt-8">
-            <span>🚪</span> Logout
-          </button>
+          <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-lg text-sm font-medium" data-page="dashboard">📊 Dashboard</button>
+          <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium" data-page="employees">👥 Employees</button>
+          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium" data-page="payroll">💰 Payroll Entry</button>
+          <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium" data-page="loans">💳 Loan Management</button>
+          <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium" data-page="reports">📈 Reports</button>
+          <button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 mt-8">🚪 Logout</button>
         </nav>
       </aside>
 
-      <!-- Main Content -->
       <main class="flex-1 ml-64 p-8">
         <div id="pageContent"></div>
       </main>
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div id="modal" class="modal hidden">
-    <div class="card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
       <div id="modalContent"></div>
     </div>
   </div>
@@ -110,12 +75,23 @@
     let payrollRecords = [];
     let loanTransactions = [];
 
-    // AUTH
     function switchAuthTab(tab) {
-      document.getElementById('formSignIn').classList.toggle('hidden', tab !== 'signIn');
-      document.getElementById('formSignUp').classList.toggle('hidden', tab !== 'signUp');
-      document.getElementById('btnTabSignIn').className = 'flex-1 py-2 rounded-md text-sm font-semibold ' + (tab === 'signIn' ? 'bg-blue-600 text-white' : 'text-gray-600');
-      document.getElementById('btnTabSignUp').className = 'flex-1 py-2 rounded-md text-sm font-semibold ' + (tab === 'signUp' ? 'bg-green-600 text-white' : 'text-gray-600');
+      var formIn = document.getElementById('formSignIn');
+      var formUp = document.getElementById('formSignUp');
+      var tabIn = document.getElementById('btnTabSignIn');
+      var tabUp = document.getElementById('btnTabSignUp');
+      
+      if (tab === 'signIn') {
+        formIn.classList.remove('hidden');
+        formUp.classList.add('hidden');
+        tabIn.className = 'flex-1 py-2 rounded-md text-sm font-semibold bg-blue-600 text-white';
+        tabUp.className = 'flex-1 py-2 rounded-md text-sm font-semibold text-gray-600';
+      } else {
+        formIn.classList.add('hidden');
+        formUp.classList.remove('hidden');
+        tabIn.className = 'flex-1 py-2 rounded-md text-sm font-semibold text-gray-600';
+        tabUp.className = 'flex-1 py-2 rounded-md text-sm font-semibold bg-green-600 text-white';
+      }
     }
 
     function showAuthMsg(text, ok) {
@@ -185,136 +161,82 @@
       else if (page === 'reports') renderReports(content);
     }
 
-    // DASHBOARD
     function renderDashboard(container) {
-      var totalPaid = payrollRecords.reduce(function(s,r) { return s + parseFloat(r.net_payable||0); }, 0);
-      var totalLoans = employees.reduce(function(s,e) { return s + parseFloat(e.loan_balance||0); }, 0);
+      var totalPaid = 0;
+      payrollRecords.forEach(function(r) { totalPaid += parseFloat(r.net_payable||0); });
+      var totalLoans = 0;
+      employees.forEach(function(e) { totalLoans += parseFloat(e.loan_balance||0); });
       var activeEmployees = employees.filter(function(e) { return e.status === 'active'; }).length;
 
-      container.innerHTML = '\
-        <h1 class="text-2xl font-bold mb-6">Dashboard</h1>\
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Active Employees</p>\
-            <p class="text-3xl font-bold text-blue-600">' + activeEmployees + '</p>\
-          </div>\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Total Paid (All Time)</p>\
-            <p class="text-3xl font-bold text-green-600">$' + totalPaid.toFixed(2) + '</p>\
-          </div>\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Outstanding Loans</p>\
-            <p class="text-3xl font-bold text-red-600">$' + totalLoans.toFixed(2) + '</p>\
-          </div>\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Payroll Records</p>\
-            <p class="text-3xl font-bold text-purple-600">' + payrollRecords.length + '</p>\
-          </div>\
-        </div>\
-        <div class="grid grid-cols-2 gap-6">\
-          <div class="card p-6">\
-            <h3 class="font-semibold mb-4">Recent Payroll</h3>\
-            <div class="space-y-3">' + payrollRecords.slice(0, 5).map(function(r) {\
-              var emp = employees.find(function(e) { return e.id === r.employee_id; });\
-              return '<div class="flex justify-between items-center py-2 border-b"><div><p class="font-medium">' + (emp?emp.name:'Unknown') + '</p><p class="text-sm text-gray-500">' + r.month + '/' + r.year + '</p></div><p class="font-semibold">$' + parseFloat(r.net_payable).toFixed(2) + '</p></div>';\
-            }).join('') + '</div>\
-          </div>\
-          <div class="card p-6">\
-            <h3 class="font-semibold mb-4">Quick Actions</h3>\
-            <div class="space-y-3">\
-              <button onclick="showPage(\'payroll\')" class="btn-primary w-full text-left">➕ New Payroll Entry</button>\
-              <button onclick="showPage(\'employees\')" class="btn-secondary w-full text-left">👥 Add Employees</button>\
-              <button onclick="showPage(\'loans\')" class="btn-secondary w-full text-left">💳 Record Loan</button>\
-            </div>\
-          </div>\
-        </div>\
-      ';
+      container.innerHTML = '<h1 class="text-2xl font-bold mb-6">Dashboard</h1>' +
+        '<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Active Employees</p><p class="text-3xl font-bold text-blue-600">' + activeEmployees + '</p></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Total Paid</p><p class="text-3xl font-bold text-green-600">$' + totalPaid.toFixed(2) + '</p></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Outstanding Loans</p><p class="text-3xl font-bold text-red-600">$' + totalLoans.toFixed(2) + '</p></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Records</p><p class="text-3xl font-bold text-purple-600">' + payrollRecords.length + '</p></div>' +
+        '</div>';
     }
 
-    // EMPLOYEES
     function renderEmployees(container) {
-      container.innerHTML = '\
-        <div class="flex justify-between items-center mb-6">\
-          <h1 class="text-2xl font-bold">Employees</h1>\
-          <div class="flex gap-3">\
-            <button onclick="showBulkImportModal()" class="btn-secondary">📥 Bulk Import CSV</button>\
-            <button onclick="showAddEmployeeModal()" class="btn-primary">➕ Add Employee</button>\
-          </div>\
-        </div>\
-        <div class="card overflow-hidden">\
-          <table class="w-full">\
-            <thead class="bg-gray-50 border-b">\
-              <tr>\
-                <th class="text-left py-3 px-4">Name</th>\
-                <th class="text-left py-3 px-4">Role</th>\
-                <th class="text-left py-3 px-4">Base Salary</th>\
-                <th class="text-left py-3 px-4">Loan Balance</th>\
-                <th class="text-left py-3 px-4">Status</th>\
-                <th class="text-left py-3 px-4">Actions</th>\
-              </tr>\
-            </thead>\
-            <tbody>' + employees.map(function(emp) {\
-              return '<tr class="table-row border-b">\
-                <td class="py-3 px-4 font-medium">' + emp.name + '</td>\
-                <td class="py-3 px-4">' + (emp.role || '-') + '</td>\
-                <td class="py-3 px-4">$' + parseFloat(emp.base_salary).toFixed(2) + '</td>\
-                <td class="py-3 px-4 ' + (emp.loan_balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600') + '">$' + parseFloat(emp.loan_balance||0).toFixed(2) + '</td>\
-                <td class="py-3 px-4"><span class="badge ' + (emp.status === 'active' ? 'badge-success' : 'badge-danger') + '">' + (emp.status || 'active') + '</span></td>\
-                <td class="py-3 px-4">\
-                  <button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:underline text-sm">View History</button>\
-                  <button onclick="deleteEmployee(\'' + emp.id + '\')" class="text-red-600 hover:underline text-sm ml-3">Delete</button>\
-                </td>\
-              </tr>';\
-            }).join('') + '</tbody>\
-          </table>\
-          ' + (employees.length === 0 ? '<p class="text-center py-8 text-gray-500">No employees yet. Add one above!</p>' : '') + '\
-        </div>\
-      ';
+      var html = '<div class="flex justify-between items-center mb-6">' +
+        '<h1 class="text-2xl font-bold">Employees</h1>' +
+        '<div class="flex gap-3">' +
+          '<button onclick="showBulkImportModal()" class="bg-gray-100 px-4 py-2 rounded-lg">📥 Bulk Import</button>' +
+          '<button onclick="showAddEmployeeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">➕ Add Employee</button>' +
+        '</div></div>' +
+        '<div class="bg-white rounded-xl shadow overflow-hidden"><table class="w-full">' +
+        '<thead class="bg-gray-50 border-b"><tr>' +
+          '<th class="text-left py-3 px-4">Name</th>' +
+          '<th class="text-left py-3 px-4">Role</th>' +
+          '<th class="text-left py-3 px-4">Salary</th>' +
+          '<th class="text-left py-3 px-4">Loan Balance</th>' +
+          '<th class="text-left py-3 px-4">Actions</th>' +
+        '</tr></thead><tbody>';
+      
+      employees.forEach(function(emp) {
+        html += '<tr class="border-b"><td class="py-3 px-4 font-medium">' + emp.name + '</td>' +
+          '<td class="py-3 px-4">' + (emp.role || '-') + '</td>' +
+          '<td class="py-3 px-4">$' + parseFloat(emp.base_salary).toFixed(2) + '</td>' +
+          '<td class="py-3 px-4 ' + (emp.loan_balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600') + '">$' + parseFloat(emp.loan_balance||0).toFixed(2) + '</td>' +
+          '<td class="py-3 px-4"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:underline text-sm">View History</button></td></tr>';
+      });
+      
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
     }
 
     function showAddEmployeeModal() {
-      document.getElementById('modalContent').innerHTML = '\
-        <h2 class="text-xl font-bold mb-4">Add Employee</h2>\
-        <form onsubmit="addEmployee(event)">\
-          <div class="space-y-4">\
-            <div><label class="block text-sm font-medium mb-1">Full Name *</label><input name="name" required class="input-field"></div>\
-            <div><label class="block text-sm font-medium mb-1">Role/Position</label><input name="role" placeholder="e.g., Chef, Server, Manager" class="input-field"></div>\
-            <div><label class="block text-sm font-medium mb-1">Base Salary *</label><input name="baseSalary" type="number" step="0.01" required class="input-field"></div>\
-            <div><label class="block text-sm font-medium mb-1">Hire Date</label><input name="hireDate" type="date" class="input-field"></div>\
-            <div><label class="block text-sm font-medium mb-1">Status</label><select name="status" class="input-field"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>\
-          </div>\
-          <div class="flex gap-3 mt-6">\
-            <button type="submit" class="btn-primary">Save Employee</button>\
-            <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>\
-          </div>\
-        </form>\
-      ';
+      document.getElementById('modalContent').innerHTML = 
+        '<h2 class="text-xl font-bold mb-4">Add Employee</h2>' +
+        '<form onsubmit="addEmployee(event)">' +
+          '<div class="space-y-4">' +
+            '<div><label class="block text-sm font-medium mb-1">Full Name *</label><input name="name" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+            '<div><label class="block text-sm font-medium mb-1">Role</label><input name="role" class="w-full px-3 py-2 border rounded-lg"></div>' +
+            '<div><label class="block text-sm font-medium mb-1">Base Salary *</label><input name="baseSalary" type="number" step="0.01" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+            '<div><label class="block text-sm font-medium mb-1">Status</label><select name="status" class="w-full px-3 py-2 border rounded-lg"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>' +
+          '</div>' +
+          '<div class="flex gap-3 mt-6">' +
+            '<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Save</button>' +
+            '<button type="button" onclick="closeModal()" class="bg-gray-100 px-4 py-2 rounded-lg">Cancel</button>' +
+          '</div></form>';
       document.getElementById('modal').classList.remove('hidden');
     }
 
     function showBulkImportModal() {
-      document.getElementById('modalContent').innerHTML = '\
-        <h2 class="text-xl font-bold mb-4">Bulk Import Employees</h2>\
-        <div class="mb-4">\
-          <p class="text-sm text-gray-600 mb-3">Upload a CSV file with columns: name, role, base_salary, hire_date</p>\
-          <div class="bg-gray-50 p-3 rounded text-xs text-gray-600 mb-3">\
-            <p><strong>Example CSV:</strong></p>\
-            <pre>name,role,base_salary,hire_date\nJohn Doe,Chef,5000,2024-01-15\nJane Smith,Server,3000,2024-02-01</pre>\
-          </div>\
-          <input type="file" id="csvFile" accept=".csv" class="input-field mb-3">\
-        </div>\
-        <div class="flex gap-3">\
-          <button onclick="processCSV()" class="btn-primary">Import CSV</button>\
-          <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>\
-        </div>\
-      ';
+      document.getElementById('modalContent').innerHTML = 
+        '<h2 class="text-xl font-bold mb-4">Bulk Import CSV</h2>' +
+        '<p class="text-sm text-gray-600 mb-3">Upload CSV with columns: name, role, base_salary</p>' +
+        '<input type="file" id="csvFile" accept=".csv" class="w-full px-3 py-2 border rounded-lg mb-3">' +
+        '<div class="flex gap-3">' +
+          '<button onclick="processCSV()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Import</button>' +
+          '<button onclick="closeModal()" class="bg-gray-100 px-4 py-2 rounded-lg">Cancel</button>' +
+        '</div>';
       document.getElementById('modal').classList.remove('hidden');
     }
 
     function processCSV() {
       var file = document.getElementById('csvFile').files[0];
-      if (!file) return alert('Please select a file');
-
+      if (!file) return alert('Select a file');
       Papa.parse(file, {
         header: true,
         complete: async function(results) {
@@ -326,7 +248,6 @@
                 name: row.name,
                 role: row.role || '',
                 base_salary: parseFloat(row.base_salary),
-                hire_date: row.hire_date || null,
                 loan_balance: 0,
                 status: 'active'
               });
@@ -347,7 +268,6 @@
         name: fd.get('name'),
         role: fd.get('role'),
         base_salary: parseFloat(fd.get('baseSalary')),
-        hire_date: fd.get('hireDate') || null,
         loan_balance: 0,
         status: fd.get('status')
       });
@@ -356,7 +276,7 @@
     }
 
     async function deleteEmployee(id) {
-      if (!confirm('Delete this employee? Past records will remain.')) return;
+      if (!confirm('Delete this employee?')) return;
       await sb.from('employees').delete().eq('id', id);
       loadData();
     }
@@ -366,137 +286,89 @@
       var empPayroll = payrollRecords.filter(function(r) { return r.employee_id === empId; });
       var empLoans = loanTransactions.filter(function(r) { return r.employee_id === empId; });
 
-      var html = '\
-        <h2 class="text-xl font-bold mb-4">Employee History: ' + emp.name + '</h2>\
-        <div class="mb-6">\
-          <h3 class="font-semibold mb-3">Payroll History (' + empPayroll.length + ' records)</h3>\
-          <div class="overflow-x-auto">\
-            <table class="w-full text-sm">\
-              <thead class="bg-gray-50">\
-                <tr><th class="text-left py-2 px-3">Month/Year</th><th class="text-left py-2 px-3">Base</th><th class="text-left py-2 px-3">Bonuses</th><th class="text-left py-2 px-3">Penalties</th><th class="text-left py-2 px-3">Leave Pay</th><th class="text-left py-2 px-3">Gratuity</th><th class="text-left py-2 px-3">Net Payable</th></tr>\
-              </thead>\
-              <tbody>' + empPayroll.map(function(r) {\
-                return '<tr class="border-b"><td class="py-2 px-3">' + r.month + '/' + r.year + '</td><td class="py-2 px-3">$' + parseFloat(r.base_salary).toFixed(2) + '</td><td class="py-2 px-3 text-green-600">+$' + parseFloat(r.bonuses||0).toFixed(2) + '</td><td class="py-2 px-3 text-red-600">-$' + parseFloat(r.penalties||0).toFixed(2) + '</td><td class="py-2 px-3">$' + parseFloat(r.leave_pay||0).toFixed(2) + '</td><td class="py-2 px-3">$' + parseFloat(r.gratuity||0).toFixed(2) + '</td><td class="py-2 px-3 font-bold">$' + parseFloat(r.net_payable).toFixed(2) + '</td></tr>';\
-              }).join('') + '</tbody>\
-            </table>\
-          </div>\
-        </div>\
-        <div>\
-          <h3 class="font-semibold mb-3">Loan Transactions (' + empLoans.length + ' records)</h3>\
-          <div class="overflow-x-auto">\
-            <table class="w-full text-sm">\
-              <thead class="bg-gray-50">\
-                <tr><th class="text-left py-2 px-3">Date</th><th class="text-left py-2 px-3">Type</th><th class="text-left py-2 px-3">Amount</th><th class="text-left py-2 px-3">Description</th><th class="text-left py-2 px-3">Balance After</th></tr>\
-              </thead>\
-              <tbody>' + empLoans.map(function(r) {\
-                return '<tr class="border-b"><td class="py-2 px-3">' + new Date(r.created_at).toLocaleDateString() + '</td><td class="py-2 px-3"><span class="badge ' + (r.type === 'advanced' ? 'badge-danger' : 'badge-success') + '">' + r.type + '</span></td><td class="py-2 px-3">$' + parseFloat(r.amount).toFixed(2) + '</td><td class="py-2 px-3">' + (r.description || '-') + '</td><td class="py-2 px-3 font-semibold">$' + parseFloat(r.balance_after).toFixed(2) + '</td></tr>';\
-              }).join('') + '</tbody>\
-            </table>\
-          </div>\
-        </div>\
-        <button onclick="closeModal()" class="btn-secondary mt-6">Close</button>\
-      ';
-
+      var html = '<h2 class="text-xl font-bold mb-4">History: ' + emp.name + '</h2>' +
+        '<h3 class="font-semibold mb-3 mt-4">Payroll History</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50"><tr>' +
+          '<th class="text-left py-2 px-3">Month/Year</th><th class="text-left py-2 px-3">Base</th><th class="text-left py-2 px-3">Bonus</th><th class="text-left py-2 px-3">Penalty</th><th class="text-left py-2 px-3">Net</th></tr></thead><tbody>';
+      
+      empPayroll.forEach(function(r) {
+        html += '<tr class="border-b"><td class="py-2 px-3">' + r.month + '/' + r.year + '</td>' +
+          '<td>$' + parseFloat(r.base_salary).toFixed(2) + '</td>' +
+          '<td class="text-green-600">+$' + parseFloat(r.bonuses||0).toFixed(2) + '</td>' +
+          '<td class="text-red-600">-$' + parseFloat(r.penalties||0).toFixed(2) + '</td>' +
+          '<td class="font-bold">$' + parseFloat(r.net_payable).toFixed(2) + '</td></tr>';
+      });
+      
+      html += '</tbody></table></div>' +
+        '<h3 class="font-semibold mb-3 mt-4">Loan Transactions</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50"><tr>' +
+          '<th class="text-left py-2 px-3">Date</th><th class="text-left py-2 px-3">Type</th><th class="text-left py-2 px-3">Amount</th><th class="text-left py-2 px-3">Balance</th></tr></thead><tbody>';
+      
+      empLoans.forEach(function(r) {
+        html += '<tr class="border-b"><td class="py-2 px-3">' + new Date(r.created_at).toLocaleDateString() + '</td>' +
+          '<td>' + r.type + '</td>' +
+          '<td>$' + parseFloat(r.amount).toFixed(2) + '</td>' +
+          '<td>$' + parseFloat(r.balance_after).toFixed(2) + '</td></tr>';
+      });
+      
+      html += '</tbody></table></div><button onclick="closeModal()" class="mt-6 bg-gray-100 px-4 py-2 rounded-lg">Close</button>';
       document.getElementById('modalContent').innerHTML = html;
       document.getElementById('modal').classList.remove('hidden');
     }
 
-    // PAYROLL
     function renderPayroll(container) {
       var today = new Date();
-      var empOptions = employees.filter(function(e) { return e.status === 'active'; }).map(function(e) {
-        return '<option value="' + e.id + '">' + e.name + ' (Base: $' + e.base_salary + ')</option>';
-      }).join('');
+      var empOptions = '';
+      employees.filter(function(e) { return e.status === 'active'; }).forEach(function(e) {
+        empOptions += '<option value="' + e.id + '">' + e.name + ' ($' + e.base_salary + ')</option>';
+      });
 
-      container.innerHTML = '\
-        <h1 class="text-2xl font-bold mb-6">Payroll Entry</h1>\
-        <div class="card p-6 mb-6">\
-          <form onsubmit="submitPayroll(event)">\
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Select Employee *</label>\
-                <select name="employeeId" required class="input-field">' + (empOptions || '<option value="">No active employees</option>') + '</select>\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Month *</label>\
-                <select name="month" required class="input-field">\
-                  <option value="1">January</option><option value="2">February</option><option value="3">March</option>\
-                  <option value="4" ' + (today.getMonth()+1 === 4 ? 'selected' : '') + '>April</option><option value="5">May</option><option value="6">June</option>\
-                  <option value="7">July</option><option value="8">August</option><option value="9">September</option>\
-                  <option value="10">October</option><option value="11">November</option><option value="12">December</option>\
-                </select>\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Year *</label>\
-                <input type="number" name="year" value="' + today.getFullYear() + '" required class="input-field">\
-              </div>\
-            </div>\
+      var html = '<h1 class="text-2xl font-bold mb-6">Payroll Entry</h1>' +
+        '<div class="bg-white rounded-xl shadow p-6">' +
+        '<form onsubmit="submitPayroll(event)">' +
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">' +
+          '<div><label class="block text-sm font-medium mb-2">Employee *</label><select name="employeeId" required class="w-full px-3 py-2 border rounded-lg">' + (empOptions || '<option>No active employees</option>') + '</select></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Month *</label><select name="month" required class="w-full px-3 py-2 border rounded-lg">' +
+            '<option value="1">January</option><option value="2">February</option><option value="3">March</option>' +
+            '<option value="4" ' + (today.getMonth()+1 === 4 ? 'selected' : '') + '>April</option><option value="5">May</option><option value="6">June</option>' +
+            '<option value="7">July</option><option value="8">August</option><option value="9">September</option>' +
+            '<option value="10">October</option><option value="11">November</option><option value="12">December</option>' +
+          '</select></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Year *</label><input type="number" name="year" value="' + today.getFullYear() + '" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+        '</div>' +
 
-            <h3 class="font-semibold mb-4 text-lg border-b pb-2">💵 Earnings (Add to Salary)</h3>\
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Bonuses</label>\
-                <input type="number" name="bonuses" step="0.01" value="0" class="input-field">\
-                <input type="text" name="bonusesDesc" placeholder="Description (optional)" class="input-field mt-2" placeholder="e.g., Performance bonus">\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Leave Pay / Overtime</label>\
-                <input type="number" name="leavePay" step="0.01" value="0" class="input-field">\
-                <input type="text" name="leavePayDesc" placeholder="Description (optional)" class="input-field mt-2">\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Gratuity</label>\
-                <input type="number" name="gratuity" step="0.01" value="0" class="input-field">\
-                <input type="text" name="gratuityDesc" placeholder="Description (optional)" class="input-field mt-2">\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Other Earnings</label>\
-                <input type="number" name="otherEarnings" step="0.01" value="0" class="input-field">\
-                <input type="text" name="otherEarningsDesc" placeholder="Description (optional)" class="input-field mt-2">\
-              </div>\
-            </div>\
+        '<h3 class="font-semibold mb-4 text-lg border-b pb-2">💵 Earnings</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
+          '<div><label class="block text-sm font-medium mb-2">Bonuses</label><input type="number" name="bonuses" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="bonusesDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Leave Pay</label><input type="number" name="leavePay" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="leavePayDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Gratuity</label><input type="number" name="gratuity" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="gratuityDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Other Earnings</label><input type="number" name="otherEarnings" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="otherEarningsDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+        '</div>' +
 
-            <h3 class="font-semibold mb-4 text-lg border-b pb-2">➖ Deductions (Subtract from Salary)</h3>\
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Penalties</label>\
-                <input type="number" name="penalties" step="0.01" value="0" class="input-field">\
-                <input type="text" name="penaltiesDesc" placeholder="Description (optional)" class="input-field mt-2" placeholder="e.g., Late arrival">\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Loan Repayment</label>\
-                <input type="number" name="loansRepaid" step="0.01" value="0" class="input-field">\
-                <input type="text" name="loansRepaidDesc" placeholder="Description (optional)" class="input-field mt-2">\
-              </div>\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Other Deductions</label>\
-                <input type="number" name="otherDeductions" step="0.01" value="0" class="input-field">\
-                <input type="text" name="otherDeductionsDesc" placeholder="Description (optional)" class="input-field mt-2">\
-              </div>\
-            </div>\
+        '<h3 class="font-semibold mb-4 text-lg border-b pb-2">➖ Deductions</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
+          '<div><label class="block text-sm font-medium mb-2">Penalties</label><input type="number" name="penalties" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="penaltiesDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Loan Repayment</label><input type="number" name="loansRepaid" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="loansRepaidDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+          '<div><label class="block text-sm font-medium mb-2">Other Deductions</label><input type="number" name="otherDeductions" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="otherDeductionsDesc" placeholder="Description" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+        '</div>' +
 
-            <h3 class="font-semibold mb-4 text-lg border-b pb-2">💳 Loan Advance (New Loans Given)</h3>\
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">\
-              <div>\
-                <label class="block text-sm font-medium mb-2">Loan Amount Advanced</label>\
-                <input type="number" name="loansAdvanced" step="0.01" value="0" class="input-field">\
-                <input type="text" name="loansAdvancedDesc" required placeholder="Description (required for loans)" class="input-field mt-2" placeholder="e.g., Emergency loan">\
-              </div>\
-            </div>\
+        '<h3 class="font-semibold mb-4 text-lg border-b pb-2">💳 Loan Advance</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
+          '<div><label class="block text-sm font-medium mb-2">Loan Amount</label><input type="number" name="loansAdvanced" step="0.01" value="0" class="w-full px-3 py-2 border rounded-lg">' +
+            '<input type="text" name="loansAdvancedDesc" placeholder="Description (required for loans)" class="w-full px-3 py-2 border rounded-lg mt-2"></div>' +
+        '</div>' +
 
-            <div class="bg-blue-50 p-4 rounded-lg mb-6">\
-              <p class="text-sm text-blue-800"><strong>Net Payable Calculation:</strong></p>\
-              <p class="text-sm text-blue-700 mt-1">Base Salary + Bonuses + Leave Pay + Gratuity + Other Earnings - Penalties - Loan Repayment - Other Deductions</p>\
-              <p class="text-lg font-bold text-blue-900 mt-2">Note: Loan advances are tracked separately and do NOT affect net payable</p>\
-            </div>\
-
-            <div class="flex gap-3">\
-              <button type="submit" class="btn-primary">Save Payroll Record</button>\
-              <button type="button" onclick="showPage(\'dashboard\')" class="btn-secondary">Cancel</button>\
-            </div>\
-          </form>\
-        </div>\
-      ';
+        '<div class="flex gap-3">' +
+          '<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Save Payroll</button>' +
+          '<button type="button" onclick="showPage(\'dashboard\')" class="bg-gray-100 px-4 py-2 rounded-lg">Cancel</button>' +
+        '</div></form></div>';
+      
+      container.innerHTML = html;
     }
 
     async function submitPayroll(e) {
@@ -507,7 +379,6 @@
       
       var month = parseInt(fd.get('month'));
       var year = parseInt(fd.get('year'));
-      var baseSalary = emp.base_salary;
       var bonuses = parseFloat(fd.get('bonuses')) || 0;
       var penalties = parseFloat(fd.get('penalties')) || 0;
       var leavePay = parseFloat(fd.get('leavePay')) || 0;
@@ -517,15 +388,13 @@
       var otherDeductions = parseFloat(fd.get('otherDeductions')) || 0;
       var loansAdvanced = parseFloat(fd.get('loansAdvanced')) || 0;
 
-      // Calculate net payable (loans advanced NOT deducted)
-      var netPayable = baseSalary + bonuses + leavePay + gratuity + otherEarnings - penalties - loansRepaid - otherDeductions;
+      var netPayable = emp.base_salary + bonuses + leavePay + gratuity + otherEarnings - penalties - loansRepaid - otherDeductions;
 
-      // Save payroll record
       var result = await sb.from('payroll_records').upsert({
         employee_id: empId,
         month: month,
         year: year,
-        base_salary: baseSalary,
+        base_salary: emp.base_salary,
         bonuses: bonuses,
         bonuses_desc: fd.get('bonusesDesc'),
         penalties: penalties,
@@ -548,7 +417,6 @@
         return;
       }
 
-      // If loan advanced, record in loan_transactions and update balance
       if (loansAdvanced > 0) {
         var currentBalance = emp.loan_balance || 0;
         var newBalance = currentBalance + loansAdvanced - loansRepaid;
@@ -577,118 +445,93 @@
         await sb.from('employees').update({ loan_balance: newBalance }).eq('id', empId);
       }
 
-      alert('Payroll saved successfully! Net Payable: $' + netPayable.toFixed(2));
+      alert('Saved! Net Payable: $' + netPayable.toFixed(2));
       loadData();
     }
 
-    // LOANS
     function renderLoans(container) {
-      var totalOutstanding = employees.reduce(function(s,e) { return s + (e.loan_balance||0); }, 0);
+      var totalOutstanding = 0;
+      employees.forEach(function(e) { totalOutstanding += parseFloat(e.loan_balance||0); });
       var employeesWithLoans = employees.filter(function(e) { return e.loan_balance > 0; });
 
-      container.innerHTML = '\
-        <h1 class="text-2xl font-bold mb-6">Loan Management</h1>\
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Total Outstanding</p>\
-            <p class="text-3xl font-bold text-red-600">$' + totalOutstanding.toFixed(2) + '</p>\
-          </div>\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Employees with Loans</p>\
-            <p class="text-3xl font-bold text-blue-600">' + employeesWithLoans.length + '</p>\
-          </div>\
-          <div class="card p-6">\
-            <p class="text-sm text-gray-500 mb-1">Total Transactions</p>\
-            <p class="text-3xl font-bold text-purple-600">' + loanTransactions.length + '</p>\
-          </div>\
-        </div>\
-        <div class="card overflow-hidden">\
-          <table class="w-full">\
-            <thead class="bg-gray-50 border-b">\
-              <tr>\
-                <th class="text-left py-3 px-4">Employee</th>\
-                <th class="text-left py-3 px-4">Current Balance</th>\
-                <th class="text-left py-3 px-4">Total Advanced</th>\
-                <th class="text-left py-3 px-4">Total Repaid</th>\
-                <th class="text-left py-3 px-4">Actions</th>\
-              </tr>\
-            </thead>\
-            <tbody>' + employees.map(function(emp) {\
-              var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });\
-              var totalAdv = empLoans.filter(function(r) { return r.type === 'advanced'; }).reduce(function(s,r) { return s + r.amount; }, 0);\
-              var totalRep = empLoans.filter(function(r) { return r.type === 'repaid'; }).reduce(function(s,r) { return s + r.amount; }, 0);\
-              return '<tr class="table-row border-b">\
-                <td class="py-3 px-4 font-medium">' + emp.name + '</td>\
-                <td class="py-3 px-4 ' + (emp.loan_balance > 0 ? 'text-red-600 font-bold' : 'text-green-600') + '">$' + (emp.loan_balance||0).toFixed(2) + '</td>\
-                <td class="py-3 px-4 text-red-600">$' + totalAdv.toFixed(2) + '</td>\
-                <td class="py-3 px-4 text-green-600">$' + totalRep.toFixed(2) + '</td>\
-                <td class="py-3 px-4"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:underline text-sm">View Full History</button></td>\
-              </tr>';\
-            }).join('') + '</tbody>\
-          </table>\
-        </div>\
-      ';
+      var html = '<h1 class="text-2xl font-bold mb-6">Loan Management</h1>' +
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Total Outstanding</p><p class="text-3xl font-bold text-red-600">$' + totalOutstanding.toFixed(2) + '</p></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Employees with Loans</p><p class="text-3xl font-bold text-blue-600">' + employeesWithLoans.length + '</p></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><p class="text-sm text-gray-500 mb-1">Transactions</p><p class="text-3xl font-bold text-purple-600">' + loanTransactions.length + '</p></div>' +
+        '</div>' +
+        '<div class="bg-white rounded-xl shadow overflow-hidden"><table class="w-full">' +
+        '<thead class="bg-gray-50 border-b"><tr>' +
+          '<th class="text-left py-3 px-4">Employee</th>' +
+          '<th class="text-left py-3 px-4">Current Balance</th>' +
+          '<th class="text-left py-3 px-4">Total Advanced</th>' +
+          '<th class="text-left py-3 px-4">Total Repaid</th>' +
+        '</tr></thead><tbody>';
+      
+      employees.forEach(function(emp) {
+        var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });
+        var totalAdv = 0, totalRep = 0;
+        empLoans.forEach(function(r) {
+          if (r.type === 'advanced') totalAdv += r.amount;
+          else totalRep += r.amount;
+        });
+        html += '<tr class="border-b"><td class="py-3 px-4 font-medium">' + emp.name + '</td>' +
+          '<td class="py-3 px-4 ' + (emp.loan_balance > 0 ? 'text-red-600 font-bold' : 'text-green-600') + '">$' + (emp.loan_balance||0).toFixed(2) + '</td>' +
+          '<td class="py-3 px-4 text-red-600">$' + totalAdv.toFixed(2) + '</td>' +
+          '<td class="py-3 px-4 text-green-600">$' + totalRep.toFixed(2) + '</td></tr>';
+      });
+      
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
     }
 
-    // REPORTS
     function renderReports(container) {
-      container.innerHTML = '\
-        <h1 class="text-2xl font-bold mb-6">Reports</h1>\
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">\
-          <div class="card p-6">\
-            <h3 class="font-semibold mb-4">Monthly Payroll Summary</h3>\
-            <button onclick="exportMonthlyReport()" class="btn-primary">📥 Export CSV</button>\
-          </div>\
-          <div class="card p-6">\
-            <h3 class="font-semibold mb-4">Employee Loan Report</h3>\
-            <button onclick="exportLoanReport()" class="btn-primary">📥 Export CSV</button>\
-          </div>\
-          <div class="card p-6">\
-            <h3 class="font-semibold mb-4">All Payroll Records</h3>\
-            <button onclick="exportAllPayroll()" class="btn-primary">📥 Export CSV</button>\
-          </div>\
-          <div class="card p-6">\
-            <h3 class="font-semibold mb-4">All Loan Transactions</h3>\
-            <button onclick="exportAllLoans()" class="btn-primary">📥 Export CSV</button>\
-          </div>\
-        </div>\
-      ';
+      container.innerHTML = '<h1 class="text-2xl font-bold mb-6">Reports</h1>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
+          '<div class="bg-white rounded-xl shadow p-6"><h3 class="font-semibold mb-4">Monthly Payroll Summary</h3><button onclick="exportMonthlyReport()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">📥 Export CSV</button></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><h3 class="font-semibold mb-4">Employee Loan Report</h3><button onclick="exportLoanReport()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">📥 Export CSV</button></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><h3 class="font-semibold mb-4">All Payroll Records</h3><button onclick="exportAllPayroll()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">📥 Export CSV</button></div>' +
+          '<div class="bg-white rounded-xl shadow p-6"><h3 class="font-semibold mb-4">All Loan Transactions</h3><button onclick="exportAllLoans()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">📥 Export CSV</button></div>' +
+        '</div>';
     }
 
     function exportMonthlyReport() {
       var csv = 'Month,Year,Employee,Base Salary,Bonuses,Penalties,Leave Pay,Gratuity,Net Payable\n';
-      payrollRecords.forEach(function(r) {\
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });\
-        csv += r.month + ',' + r.year + ',' + (emp?emp.name:'Unknown') + ',' + r.base_salary + ',' + (r.bonuses||0) + ',' + (r.penalties||0) + ',' + (r.leave_pay||0) + ',' + (r.gratuity||0) + ',' + r.net_payable + '\n';\
+      payrollRecords.forEach(function(r) {
+        var emp = employees.find(function(e) { return e.id === r.employee_id; });
+        csv += r.month + ',' + r.year + ',' + (emp?emp.name:'Unknown') + ',' + r.base_salary + ',' + (r.bonuses||0) + ',' + (r.penalties||0) + ',' + (r.leave_pay||0) + ',' + (r.gratuity||0) + ',' + r.net_payable + '\n';
       });
       downloadCSV(csv, 'monthly-payroll-report.csv');
     }
 
     function exportLoanReport() {
       var csv = 'Employee,Current Balance,Total Advanced,Total Repaid\n';
-      employees.forEach(function(emp) {\
-        var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });\
-        var totalAdv = empLoans.filter(function(r) { return r.type === 'advanced'; }).reduce(function(s,r) { return s + r.amount; }, 0);\
-        var totalRep = empLoans.filter(function(r) { return r.type === 'repaid'; }).reduce(function(s,r) { return s + r.amount; }, 0);\
-        csv += emp.name + ',' + (emp.loan_balance||0) + ',' + totalAdv + ',' + totalRep + '\n';\
+      employees.forEach(function(emp) {
+        var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });
+        var totalAdv = 0, totalRep = 0;
+        empLoans.forEach(function(r) {
+          if (r.type === 'advanced') totalAdv += r.amount;
+          else totalRep += r.amount;
+        });
+        csv += emp.name + ',' + (emp.loan_balance||0) + ',' + totalAdv + ',' + totalRep + '\n';
       });
       downloadCSV(csv, 'loan-report.csv');
     }
 
     function exportAllPayroll() {
-      var csv = 'Month,Year,Employee,Base,Bonuses,Bonus Desc,Penalties,Penalty Desc,Leave Pay,Leave Desc,Gratuity,Gratuity Desc,Other Earnings,Other Earn Desc,Loans Repaid,Loan Rep Desc,Other Ded,Other Ded Desc,Net Payable\n';
-      payrollRecords.forEach(function(r) {\
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });\
-        csv += r.month + ',' + r.year + ',' + (emp?emp.name:'Unknown') + ',' + r.base_salary + ',' + (r.bonuses||0) + ',"' + (r.bonuses_desc||'') + '",' + (r.penalties||0) + ',"' + (r.penalties_desc||'') + '",' + (r.leave_pay||0) + ',"' + (r.leave_pay_desc||'') + '",' + (r.gratuity||0) + ',"' + (r.gratuity_desc||'') + '",' + (r.other_earnings||0) + ',"' + (r.other_earnings_desc||'') + '",' + (r.loans_repaid||0) + ',"' + (r.loans_repaid_desc||'') + '",' + (r.other_deductions||0) + ',"' + (r.other_deductions_desc||'') + '",' + r.net_payable + '\n';\
+      var csv = 'Month,Year,Employee,Base,Bonuses,Penalties,Leave Pay,Gratuity,Net Payable\n';
+      payrollRecords.forEach(function(r) {
+        var emp = employees.find(function(e) { return e.id === r.employee_id; });
+        csv += r.month + ',' + r.year + ',' + (emp?emp.name:'Unknown') + ',' + r.base_salary + ',' + (r.bonuses||0) + ',' + (r.penalties||0) + ',' + (r.leave_pay||0) + ',' + (r.gratuity||0) + ',' + r.net_payable + '\n';
       });
       downloadCSV(csv, 'all-payroll-records.csv');
     }
 
     function exportAllLoans() {
       var csv = 'Date,Employee,Type,Amount,Description,Balance After\n';
-      loanTransactions.forEach(function(r) {\
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });\
-        csv += new Date(r.created_at).toLocaleDateString() + ',' + (emp?emp.name:'Unknown') + ',' + r.type + ',' + r.amount + ',"' + (r.description||'') + '",' + r.balance_after + '\n';\
+      loanTransactions.forEach(function(r) {
+        var emp = employees.find(function(e) { return e.id === r.employee_id; });
+        csv += new Date(r.created_at).toLocaleDateString() + ',' + (emp?emp.name:'Unknown') + ',' + r.type + ',' + r.amount + ',' + (r.description||'') + ',' + r.balance_after + '\n';
       });
       downloadCSV(csv, 'all-loan-transactions.csv');
     }
