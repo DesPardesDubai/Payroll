@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; }
@@ -24,16 +23,12 @@
     .metric-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .badge { padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
     .badge-success { background: #d1fae5; color: #065f46; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
     .badge-danger { background: #fee2e2; color: #991b1b; }
-    .badge-info { background: #dbeafe; color: #1e40af; }
     .table-row:hover { background: #f9fafb; }
-    .gradient-text { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   </style>
 </head>
 <body class="bg-gray-50">
 
-  <!-- AUTH -->
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
     <div class="card p-10 w-full max-w-md shadow-xl">
       <div class="text-center mb-8">
@@ -41,93 +36,50 @@
         <h1 class="text-3xl font-bold text-gray-900 mb-2">DesPardes Payroll</h1>
         <p class="text-gray-500">Professional Restaurant Management</p>
       </div>
-      
       <div class="flex bg-gray-100 rounded-xl p-1 mb-6">
         <button id="btnTabSignIn" class="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white text-gray-900 shadow-sm" onclick="switchAuthTab('signIn')">Sign In</button>
         <button id="btnTabSignUp" class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-500" onclick="switchAuthTab('signUp')">Create Account</button>
       </div>
-
       <form id="formSignIn" onsubmit="handleSignIn(event)">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-          <input type="email" id="inEmail" required placeholder="you@company.com" class="input-field">
-        </div>
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-          <input type="password" id="inPass" required placeholder="••••••••" class="input-field">
-        </div>
+        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label><input type="email" id="inEmail" required placeholder="you@company.com" class="input-field"></div>
+        <div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-2">Password</label><input type="password" id="inPass" required placeholder="••••••••" class="input-field"></div>
         <button type="submit" class="btn-primary w-full py-3 text-base">Sign In to Dashboard</button>
       </form>
-
       <form id="formSignUp" class="hidden" onsubmit="handleSignUp(event)">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-          <input type="email" id="upEmail" required placeholder="you@company.com" class="input-field">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-          <input type="password" id="upPass" required minlength="6" placeholder="Min 6 characters" class="input-field">
-        </div>
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-          <input type="password" id="upPass2" required minlength="6" placeholder="Confirm password" class="input-field">
-        </div>
+        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label><input type="email" id="upEmail" required placeholder="you@company.com" class="input-field"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Password</label><input type="password" id="upPass" required minlength="6" placeholder="Min 6 characters" class="input-field"></div>
+        <div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label><input type="password" id="upPass2" required minlength="6" placeholder="Confirm password" class="input-field"></div>
         <button type="submit" class="w-full py-3 text-base rounded-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition">Create Account</button>
       </form>
-
       <div id="authMsg" class="mt-6 text-sm text-center hidden"></div>
     </div>
   </div>
 
-  <!-- MAIN APP -->
   <div id="appScreen" class="hidden min-h-screen bg-gray-50">
     <div class="flex">
-      <!-- Sidebar -->
       <aside class="w-64 bg-white border-r border-gray-200 fixed h-full overflow-y-auto shadow-sm">
         <div class="p-6 border-b border-gray-100">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl">🍽️</div>
-            <div>
-              <h2 class="text-lg font-bold text-gray-900">DesPardes</h2>
-              <p class="text-xs text-gray-500">Payroll Pro</p>
-            </div>
+            <div><h2 class="text-lg font-bold text-gray-900">DesPardes</h2><p class="text-xs text-gray-500">Payroll Pro</p></div>
           </div>
         </div>
         <nav class="p-4 space-y-1">
-          <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="dashboard">
-            <span class="text-xl">📊</span> Dashboard
-          </button>
-          <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="employees">
-            <span class="text-xl">👥</span> Employees
-          </button>
-          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="payroll">
-            <span class="text-xl">💰</span> Payroll Entry
-          </button>
-          <button onclick="showPage('bulkPayroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="bulkPayroll">
-            <span class="text-xl">⚡</span> Bulk Payroll
-          </button>
-          <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="loans">
-            <span class="text-xl">💳</span> Loans
-          </button>
-          <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="reports">
-            <span class="text-xl">📈</span> Reports
-          </button>
-          <div class="pt-4 mt-4 border-t border-gray-100">
-            <button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 text-red-600">
-              <span class="text-xl">🚪</span> Logout
-            </button>
-          </div>
+          <button onclick="showPage('dashboard')" class="sidebar-item active w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="dashboard"><span class="text-xl">📊</span> Dashboard</button>
+          <button onclick="showPage('employees')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="employees"><span class="text-xl">👥</span> Employees</button>
+          <button onclick="showPage('payroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="payroll"><span class="text-xl">💰</span> Payroll Entry</button>
+          <button onclick="showPage('bulkPayroll')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="bulkPayroll"><span class="text-xl">⚡</span> Bulk Payroll</button>
+          <button onclick="showPage('loans')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="loans"><span class="text-xl">💳</span> Loans</button>
+          <button onclick="showPage('reports')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition" data-page="reports"><span class="text-xl">📈</span> Reports</button>
+          <div class="pt-4 mt-4 border-t border-gray-100"><button onclick="handleLogout()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 text-red-600"><span class="text-xl">🚪</span> Logout</button></div>
         </nav>
       </aside>
-
-      <!-- Main Content -->
       <main class="flex-1 ml-64 p-8">
         <div id="pageContent"></div>
       </main>
     </div>
   </div>
 
-  <!-- MODAL -->
   <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
     <div class="card p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
       <div id="modalContent"></div>
@@ -148,15 +100,12 @@
       var formUp = document.getElementById('formSignUp');
       var tabIn = document.getElementById('btnTabSignIn');
       var tabUp = document.getElementById('btnTabSignUp');
-      
       if (tab === 'signIn') {
-        formIn.classList.remove('hidden');
-        formUp.classList.add('hidden');
+        formIn.classList.remove('hidden'); formUp.classList.add('hidden');
         tabIn.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white text-gray-900 shadow-sm';
         tabUp.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-500';
       } else {
-        formIn.classList.add('hidden');
-        formUp.classList.remove('hidden');
+        formIn.classList.add('hidden'); formUp.classList.remove('hidden');
         tabIn.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-500';
         tabUp.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white text-gray-900 shadow-sm';
       }
@@ -171,32 +120,21 @@
 
     async function handleSignIn(e) {
       e.preventDefault();
-      var result = await sb.auth.signInWithPassword({
-        email: document.getElementById('inEmail').value,
-        password: document.getElementById('inPass').value
-      });
-      if (result.error) showAuthMsg('Invalid credentials');
-      else initApp();
+      var result = await sb.auth.signInWithPassword({ email: document.getElementById('inEmail').value, password: document.getElementById('inPass').value });
+      if (result.error) showAuthMsg('Invalid credentials'); else initApp();
     }
 
     async function handleSignUp(e) {
       e.preventDefault();
       var pass = document.getElementById('upPass').value;
       if (pass !== document.getElementById('upPass2').value) return showAuthMsg('Passwords mismatch');
-      
-      var result = await sb.auth.signUp({
-        email: document.getElementById('upEmail').value,
-        password: pass
-      });
+      var result = await sb.auth.signUp({ email: document.getElementById('upEmail').value, password: pass });
       if (result.error) showAuthMsg(result.error.message);
       else if (result.data.session) initApp();
       else showAuthMsg('Check email to confirm', true);
     }
 
-    async function handleLogout() {
-      await sb.auth.signOut();
-      location.reload();
-    }
+    async function handleLogout() { await sb.auth.signOut(); location.reload(); }
 
     function initApp() {
       document.getElementById('authScreen').classList.add('hidden');
@@ -208,19 +146,14 @@
       var empRes = await sb.from('employees').select('*').order('name');
       var payRes = await sb.from('payroll_records').select('*').order('year').order('month', {ascending: false});
       var loanRes = await sb.from('loan_transactions').select('*').order('created_at', {ascending: false});
-      
       employees = empRes.data || [];
       payrollRecords = payRes.data || [];
       loanTransactions = loanRes.data || [];
-      
       showPage('dashboard');
     }
 
     function showPage(page) {
-      document.querySelectorAll('.sidebar-item').forEach(function(b) {
-        b.classList.toggle('active', b.dataset.page === page);
-      });
-
+      document.querySelectorAll('.sidebar-item').forEach(function(b) { b.classList.toggle('active', b.dataset.page === page); });
       var content = document.getElementById('pageContent');
       if (page === 'dashboard') renderDashboard(content);
       else if (page === 'employees') renderEmployees(content);
@@ -234,41 +167,49 @@
       var totalPaid = 0, totalLoans = 0, activeEmployees = 0;
       payrollRecords.forEach(function(r) { totalPaid += parseFloat(r.net_payable||0); });
       employees.forEach(function(e) { totalLoans += parseFloat(e.loan_balance||0); if(e.status==='active') activeEmployees++; });
-
       container.innerHTML = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1><p class="text-gray-500">Welcome back! Here\'s what\'s happening today.</p></div>' +
         '<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Active Employees</p><span class="text-2xl">👥</span></div><p class="text-3xl font-bold text-gray-900">' + activeEmployees + '</p><p class="text-sm text-green-600 mt-2 font-medium">+12% from last month</p></div>' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Total Paid</p><span class="text-2xl">💰</span></div><p class="text-3xl font-bold text-gray-900">$' + totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</p><p class="text-sm text-green-600 mt-2 font-medium">+8.2% from last month</p></div>' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Outstanding Loans</p><span class="text-2xl">💳</span></div><p class="text-3xl font-bold text-gray-900">$' + totalLoans.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</p><p class="text-sm text-red-600 mt-2 font-medium">-3.1% from last month</p></div>' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Payroll Records</p><span class="text-2xl">📋</span></div><p class="text-3xl font-bold text-gray-900">' + payrollRecords.length + '</p><p class="text-sm text-gray-400 mt-2 font-medium">Total records</p></div>' +
-        '</div>' +
-        '<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">' +
-          '<div class="card p-6"><h3 class="text-lg font-bold text-gray-900 mb-4">Recent Payroll</h3><div class="space-y-3">' + payrollRecords.slice(0, 5).map(function(r) { var emp = employees.find(function(e) { return e.id === r.employee_id; }); return '<div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">' + (emp?emp.name.charAt(0):'?') + '</div><div><p class="font-semibold text-gray-900">' + (emp?emp.name:'Unknown') + '</p><p class="text-sm text-gray-500">' + r.month + '/' + r.year + '</p></div></div><p class="font-bold text-gray-900">$' + parseFloat(r.net_payable).toFixed(2) + '</p></div>'; }).join('') + '</div></div>' +
-          '<div class="card p-6"><h3 class="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3><div class="space-y-3"><button onclick="showPage(\'payroll\')" class="w-full p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition flex items-center justify-between"><span>➕ New Payroll Entry</span><span>→</span></button><button onclick="showPage(\'employees\')" class="w-full p-4 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition flex items-center justify-between"><span>👥 Add Employees</span><span>→</span></button><button onclick="showPage(\'loans\')" class="w-full p-4 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition flex items-center justify-between"><span>💳 Record Loan</span><span>→</span></button></div></div>' +
+          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Active Employees</p><p class="text-3xl font-bold text-gray-900 mt-1">' + activeEmployees + '</p></div>' +
+          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Total Paid</p><p class="text-3xl font-bold text-gray-900 mt-1">$' + totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</p></div>' +
+          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Outstanding Loans</p><p class="text-3xl font-bold text-gray-900 mt-1">$' + totalLoans.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</p></div>' +
+          '<div class="metric-card"><p class="text-sm text-gray-500 font-medium">Payroll Records</p><p class="text-3xl font-bold text-gray-900 mt-1">' + payrollRecords.length + '</p></div>' +
         '</div>';
     }
 
     function renderEmployees(container) {
-      var html = '<div class="flex justify-between items-center mb-8"><div><h1 class="text-3xl font-bold text-gray-900 mb-1">Employees</h1><p class="text-gray-500">Manage your team members</p></div><div class="flex gap-3"><button onclick="showImportExcelModal()" class="btn-secondary flex items-center gap-2"><span>📥</span> Import Excel</button><button onclick="showAddEmployeeModal()" class="btn-primary flex items-center gap-2"><span>➕</span> Add Employee</button></div></div>' +
-        '<div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Position</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Contracted Salary</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Loan Balance</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Actions</th></tr></thead><tbody>';
-      
+      var html = '<div class="flex justify-between items-center mb-8"><div><h1 class="text-3xl font-bold text-gray-900 mb-1">Employees</h1><p class="text-gray-500">Manage your team members</p></div><div class="flex gap-3"><button onclick="showImportExcelModal()" class="btn-secondary flex items-center gap-2">📥 Import Excel</button><button onclick="showAddEmployeeModal()" class="btn-primary flex items-center gap-2">➕ Add Employee</button></div></div>' +
+        '<div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Position</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Salary</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Loan Balance</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Actions</th></tr></thead><tbody>';
       employees.forEach(function(emp) {
-        html += '<tr class="table-row border-b border-gray-100"><td class="py-4 px-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">' + emp.name.charAt(0) + '</div><div><p class="font-semibold text-gray-900">' + emp.name + '</p></div></div></td>' +
+        html += '<tr class="table-row border-b border-gray-100"><td class="py-4 px-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">' + emp.name.charAt(0) + '</div><p class="font-semibold text-gray-900">' + emp.name + '</p></div></td>' +
           '<td class="py-4 px-6 text-gray-600">' + (emp.role || '-') + '</td>' +
           '<td class="py-4 px-6 font-semibold text-gray-900">$' + parseFloat(emp.base_salary).toFixed(2) + '</td>' +
           '<td class="py-4 px-6"><span class="' + (emp.loan_balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600') + '">$' + parseFloat(emp.loan_balance||0).toFixed(2) + '</span></td>' +
-          '<td class="py-4 px-6"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">View History</button></td></tr>';
+          '<td class="py-4 px-6 flex gap-3"><button onclick="viewEmployeeHistory(\'' + emp.id + '\')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">History</button><button onclick="deleteEmployee(\'' + emp.id + '\')" class="text-red-600 hover:text-red-700 font-medium text-sm">Delete</button></td></tr>';
       });
-      
-      html += '</tbody></table>' + (employees.length === 0 ? '<p class="text-center py-12 text-gray-500">No employees yet. Add one above!</p>' : '') + '</div>';
+      html += '</tbody></table></div>';
       container.innerHTML = html;
+    }
+
+    function getDaysInMonth(month, year) {
+      return new Date(year, month, 0).getDate();
+    }
+
+    function autoUpdateDays() {
+      var month = parseInt(document.getElementById('payMonth')?.value || 1);
+      var year = parseInt(document.getElementById('payYear')?.value || new Date().getFullYear());
+      var totalDays = getDaysInMonth(month, year);
+      var totalDaysInput = document.getElementById('totalDays');
+      var daysWorkedInput = document.getElementById('daysWorked');
+      if (totalDaysInput) totalDaysInput.value = totalDays;
+      if (daysWorkedInput && daysWorkedInput.value > totalDays) daysWorkedInput.value = totalDays;
+      calcActualSalary();
     }
 
     function showImportExcelModal() {
       document.getElementById('modalContent').innerHTML = 
         '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Import from Excel</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
         '<div class="mb-6"><p class="text-gray-600 mb-4">Upload your Excel file to bulk import employees</p>' +
-          '<div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4"><p class="text-sm text-blue-800 font-medium mb-2">Required columns:</p><ul class="text-sm text-blue-700 space-y-1"><li>• Description (Employee Name)</li><li>• Position</li><li>• Contracted Salary</li></ul></div>' +
+          '<div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4"><p class="text-sm text-blue-800 font-medium mb-2">Supported columns:</p><ul class="text-sm text-blue-700 space-y-1"><li>• Description / Name</li><li>• Position / Role</li><li>• Contracted Salary</li><li>• Opening Loan Balance (optional)</li></ul></div>' +
           '<input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="input-field mb-4">' +
         '</div>' +
         '<div class="flex gap-3"><button onclick="processExcelImport()" class="btn-primary flex-1">Import Data</button><button onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div>';
@@ -278,41 +219,25 @@
     function processExcelImport() {
       var file = document.getElementById('excelFile').files[0];
       if (!file) return alert('Please select a file');
-
       var reader = new FileReader();
       reader.onload = function(e) {
         var data = new Uint8Array(e.target.result);
         var workbook = XLSX.read(data, {type: 'array'});
         var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         var jsonData = XLSX.utils.sheet_to_json(firstSheet);
-
         var count = 0;
         var promises = [];
-        
         jsonData.forEach(function(row) {
           var name = row['Description'] || row['description'] || row['Name'] || row['name'];
           var position = row['Position'] || row['position'] || row['Role'] || row['role'] || '';
           var salary = row['Contracted Salary'] || row['Contracted_Salary'] || row['salary'] || row['Salary'] || 0;
-          
+          var loan = row['Opening Loan Balance'] || row['Loan Balance'] || row['loan_balance'] || 0;
           if (name && salary) {
-            promises.push(sb.from('employees').insert({
-              name: name,
-              role: position,
-              base_salary: parseFloat(salary),
-              loan_balance: 0,
-              status: 'active'
-            }));
+            promises.push(sb.from('employees').insert({ name: name, role: position, base_salary: parseFloat(salary), loan_balance: parseFloat(loan), status: 'active' }));
             count++;
           }
         });
-
-        Promise.all(promises).then(function() {
-          alert('Successfully imported ' + count + ' employees!');
-          closeModal();
-          loadData();
-        }).catch(function(err) {
-          alert('Error importing: ' + err.message);
-        });
+        Promise.all(promises).then(function() { alert('Imported ' + count + ' employees!'); closeModal(); loadData(); }).catch(function(err) { alert('Error: ' + err.message); });
       };
       reader.readAsArrayBuffer(file);
     }
@@ -320,12 +245,12 @@
     function showAddEmployeeModal() {
       document.getElementById('modalContent').innerHTML = 
         '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">Add Employee</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<form onsubmit="addEmployee(event)"><div class="space-y-4">' +
+        '<form onsubmit="addEmployee(event)"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label><input name="name" required class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Position</label><input name="role" placeholder="e.g., Chef, Server" class="input-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Position</label><input name="role" class="input-field"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Contracted Salary *</label><input name="baseSalary" type="number" step="0.01" required class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Status</label><select name="status" class="input-field"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>' +
-        '</div><div class="flex gap-3 mt-6"><button type="submit" class="btn-primary flex-1">Save Employee</button><button type="button" onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div></form>';
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Opening Loan Balance</label><input name="openingLoan" type="number" step="0.01" value="0" class="input-field"></div>' +
+        '</div><div class="flex gap-3"><button type="submit" class="btn-primary flex-1">Save Employee</button><button type="button" onclick="closeModal()" class="btn-secondary flex-1">Cancel</button></div></form>';
       document.getElementById('modal').classList.remove('hidden');
     }
 
@@ -333,18 +258,14 @@
       e.preventDefault();
       var fd = new FormData(e.target);
       await sb.from('employees').insert({
-        name: fd.get('name'),
-        role: fd.get('role'),
-        base_salary: parseFloat(fd.get('baseSalary')),
-        loan_balance: 0,
-        status: fd.get('status')
+        name: fd.get('name'), role: fd.get('role'), base_salary: parseFloat(fd.get('baseSalary')),
+        loan_balance: parseFloat(fd.get('openingLoan')) || 0, status: 'active'
       });
-      closeModal();
-      loadData();
+      closeModal(); loadData();
     }
 
     async function deleteEmployee(id) {
-      if (!confirm('Delete this employee?')) return;
+      if (!confirm('Are you sure you want to delete this employee? Past payroll records will remain.')) return;
       await sb.from('employees').delete().eq('id', id);
       loadData();
     }
@@ -353,21 +274,12 @@
       var emp = employees.find(function(e) { return e.id === empId; });
       var empPayroll = payrollRecords.filter(function(r) { return r.employee_id === empId; });
       var empLoans = loanTransactions.filter(function(r) { return r.employee_id === empId; });
-
       var html = '<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-900">History: ' + emp.name + '</h2><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button></div>' +
-        '<div class="mb-6"><h3 class="font-semibold text-gray-900 mb-3">Payroll History (' + empPayroll.length + ' records)</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 rounded-lg"><tr><th class="text-left py-3 px-4 font-medium text-gray-700 rounded-l-lg">Month/Year</th><th class="text-left py-3 px-4 font-medium text-gray-700">Days</th><th class="text-left py-3 px-4 font-medium text-gray-700">Actual Salary</th><th class="text-left py-3 px-4 font-medium text-gray-700">Bonus</th><th class="text-left py-3 px-4 font-medium text-gray-700">Advance</th><th class="text-left py-3 px-4 font-medium text-gray-700 rounded-r-lg">Net</th></tr></thead><tbody>';
-      
-      empPayroll.forEach(function(r) {
-        html += '<tr class="border-b border-gray-100"><td class="py-3 px-4 font-medium">' + r.month + '/' + r.year + '</td><td class="py-3 px-4 text-gray-600">' + (r.days_worked||28) + '/' + (r.total_days||28) + '</td><td class="py-3 px-4">$' + parseFloat(r.actual_salary||r.base_salary).toFixed(2) + '</td><td class="py-3 px-4 text-green-600">+$' + parseFloat(r.bonuses||0).toFixed(2) + '</td><td class="py-3 px-4 text-red-600">-$' + parseFloat(r.advance_salary||0).toFixed(2) + '</td><td class="py-3 px-4 font-bold text-gray-900">$' + parseFloat(r.net_payable).toFixed(2) + '</td></tr>';
-      });
-      
-      html += '</tbody></table></div></div><div><h3 class="font-semibold text-gray-900 mb-3">Loan Transactions (' + empLoans.length + ' records)</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 rounded-lg"><tr><th class="text-left py-3 px-4 font-medium text-gray-700 rounded-l-lg">Date</th><th class="text-left py-3 px-4 font-medium text-gray-700">Type</th><th class="text-left py-3 px-4 font-medium text-gray-700">Amount</th><th class="text-left py-3 px-4 font-medium text-gray-700 rounded-r-lg">Balance</th></tr></thead><tbody>';
-      
-      empLoans.forEach(function(r) {
-        html += '<tr class="border-b border-gray-100"><td class="py-3 px-4">' + new Date(r.created_at).toLocaleDateString() + '</td><td class="py-3 px-4"><span class="badge ' + (r.type === 'advanced' ? 'badge-danger' : 'badge-success') + '">' + r.type + '</span></td><td class="py-3 px-4 font-medium">$' + parseFloat(r.amount).toFixed(2) + '</td><td class="py-3 px-4 font-semibold">$' + parseFloat(r.balance_after).toFixed(2) + '</td></tr>';
-      });
-      
-      html += '</tbody></table></div></div>';
+        '<h3 class="font-semibold text-gray-900 mb-3">Payroll History</h3><div class="overflow-x-auto mb-6"><table class="w-full text-sm"><thead class="bg-gray-50 rounded-lg"><tr><th class="text-left py-3 px-4 font-medium text-gray-700">Month</th><th class="text-left py-3 px-4 font-medium text-gray-700">Days</th><th class="text-left py-3 px-4 font-medium text-gray-700">Actual Salary</th><th class="text-left py-3 px-4 font-medium text-gray-700">Net Payable</th></tr></thead><tbody>';
+      empPayroll.forEach(function(r) { html += '<tr class="border-b border-gray-100"><td class="py-3 px-4">' + r.month + '/' + r.year + '</td><td class="py-3 px-4">' + (r.days_worked||28) + '/' + (r.total_days||28) + '</td><td class="py-3 px-4">$' + parseFloat(r.actual_salary||r.base_salary).toFixed(2) + '</td><td class="py-3 px-4 font-bold">$' + parseFloat(r.net_payable).toFixed(2) + '</td></tr>'; });
+      html += '</tbody></table></div><h3 class="font-semibold text-gray-900 mb-3">Loan Transactions</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 rounded-lg"><tr><th class="text-left py-3 px-4 font-medium text-gray-700">Date</th><th class="text-left py-3 px-4 font-medium text-gray-700">Type</th><th class="text-left py-3 px-4 font-medium text-gray-700">Amount</th><th class="text-left py-3 px-4 font-medium text-gray-700">Balance</th></tr></thead><tbody>';
+      empLoans.forEach(function(r) { html += '<tr class="border-b border-gray-100"><td class="py-3 px-4">' + new Date(r.created_at).toLocaleDateString() + '</td><td class="py-3 px-4"><span class="badge ' + (r.type === 'advanced' ? 'badge-danger' : 'badge-success') + '">' + r.type + '</span></td><td class="py-3 px-4">$' + parseFloat(r.amount).toFixed(2) + '</td><td class="py-3 px-4 font-semibold">$' + parseFloat(r.balance_after).toFixed(2) + '</td></tr>'; });
+      html += '</tbody></table></div>';
       document.getElementById('modalContent').innerHTML = html;
       document.getElementById('modal').classList.remove('hidden');
     }
@@ -375,65 +287,53 @@
     function renderPayroll(container) {
       var today = new Date();
       var empOptions = '';
-      employees.filter(function(e) { return e.status === 'active'; }).forEach(function(e) {
-        empOptions += '<option value="' + e.id + '" data-salary="' + e.base_salary + '">' + e.name + ' ($' + e.base_salary + ')</option>';
-      });
+      employees.filter(function(e) { return e.status === 'active'; }).forEach(function(e) { empOptions += '<option value="' + e.id + '" data-salary="' + e.base_salary + '">' + e.name + ' ($' + e.base_salary + ')</option>'; });
+      var monthDefault = today.getMonth() + 1;
+      var yearDefault = today.getFullYear();
+      var daysInMonth = getDaysInMonth(monthDefault, yearDefault);
 
-      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Payroll Entry</h1><p class="text-gray-500">Process monthly payroll for employees</p></div>' +
-        '<div class="card p-8">' +
-        '<form onsubmit="submitPayroll(event)">' +
+      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Payroll Entry</h1><p class="text-gray-500">Process monthly payroll</p></div>' +
+        '<div class="card p-8"><form onsubmit="submitPayroll(event)">' +
         '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Employee *</label><select id="employeeSelect" required onchange="updateSalaryCalc()" class="input-field">' + (empOptions || '<option>No active employees</option>') + '</select></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month *</label><select name="month" required class="input-field"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4" ' + (today.getMonth()+1 === 4 ? 'selected' : '') + '>April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year *</label><input type="number" name="year" value="' + today.getFullYear() + '" required class="input-field"></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month *</label><select id="payMonth" name="month" required onchange="autoUpdateDays()" class="input-field"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4" ' + (monthDefault===4?'selected':'') + '>April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year *</label><input id="payYear" type="number" name="year" value="' + yearDefault + '" required onchange="autoUpdateDays()" class="input-field"></div>' +
         '</div>' +
-
         '<div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl mb-8 border border-blue-100">' +
-          '<h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><span>💰</span> Salary Calculation</h3>' +
+          '<h3 class="font-bold text-gray-900 mb-4">💰 Salary Calculation</h3>' +
           '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
             '<div><label class="block text-sm font-medium text-gray-700 mb-2">Contracted Salary</label><input type="number" id="contractedSalary" readonly class="input-field bg-gray-100"></div>' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Total Days</label><input type="number" name="totalDays" id="totalDays" value="28" onchange="calcActualSalary()" class="input-field"></div>' +
-            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Days Worked</label><input type="number" name="daysWorked" id="daysWorked" value="28" onchange="calcActualSalary()" class="input-field"></div>' +
+            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Total Days (Auto)</label><input type="number" id="totalDays" name="totalDays" value="' + daysInMonth + '" readonly class="input-field bg-gray-100"></div>' +
+            '<div><label class="block text-sm font-medium text-gray-700 mb-2">Days Worked</label><input type="number" id="daysWorked" name="daysWorked" value="' + daysInMonth + '" onchange="calcActualSalary()" class="input-field"></div>' +
           '</div>' +
-          '<div class="mt-4"><label class="block text-sm font-medium text-gray-700 mb-2">Actual Salary (Auto-calculated)</label><input type="number" id="actualSalary" readonly class="input-field bg-gray-100 font-bold text-blue-700 text-lg"></div>' +
+          '<div class="mt-4"><label class="block text-sm font-medium text-gray-700 mb-2">Actual Salary (Auto)</label><input type="number" id="actualSalary" readonly class="input-field bg-gray-100 font-bold text-blue-700 text-lg"></div>' +
         '</div>' +
-
-        '<h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-green-500">💵</span> Additions</h3>' +
-        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
+        '<h3 class="font-bold text-gray-900 mb-4">💵 Additions</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Bonuses</label><input type="number" name="bonuses" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="bonusesDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Leave Pay</label><input type="number" name="leavePay" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="leavePayDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Gratuity</label><input type="number" name="gratuity" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="gratuityDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Earnings</label><input type="number" name="otherEarnings" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="otherEarningsDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
         '</div>' +
-
-        '<h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-red-500">➖</span> Deductions</h3>' +
-        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
+        '<h3 class="font-bold text-gray-900 mb-4">➖ Deductions</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Penalties</label><input type="number" name="penalties" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="penaltiesDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Repayment</label><input type="number" name="loansRepaid" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="loansRepaidDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Advance Salary</label><input type="number" name="advanceSalary" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="advanceSalaryDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Other Deductions</label><input type="number" name="otherDeductions" step="0.01" value="0" onchange="calcNetPayable()" class="input-field calc-field"><input type="text" name="otherDeductionsDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
         '</div>' +
-
-        '<h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-purple-500">💳</span> Loan Advance (New Loans)</h3>' +
-        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount</label><input type="number" name="loansAdvanced" step="0.01" value="0" class="input-field"><input type="text" name="loansAdvancedDesc" placeholder="Description (required)" class="input-field mt-2 text-sm"></div>' +
+        '<h3 class="font-bold text-gray-900 mb-4">💳 Loan Advance</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount</label><input type="number" name="loansAdvanced" step="0.01" value="0" class="input-field"><input type="text" name="loansAdvancedDesc" placeholder="Description" class="input-field mt-2 text-sm"></div>' +
         '</div>' +
-
         '<div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl mb-8 border border-green-100">' +
-          '<p class="text-lg font-bold text-gray-900 mb-1">Net Payable: <span class="text-3xl text-green-600">$<span id="netPayableDisplay">0.00</span></span></p>' +
-          '<p class="text-sm text-gray-600">Actual Salary + Additions - Deductions</p>' +
+          '<p class="text-lg font-bold text-gray-900">Net Payable: <span class="text-3xl text-green-600">$<span id="netPayableDisplay">0.00</span></span></p>' +
         '</div>' +
-
-        '<div class="flex gap-3"><button type="submit" class="btn-primary flex-1 py-3 text-base">Save Payroll Record</button><button type="button" onclick="showPage(\'dashboard\')" class="btn-secondary flex-1 py-3 text-base">Cancel</button></div></form></div>';
-      
+        '<div class="flex gap-3"><button type="submit" class="btn-primary flex-1 py-3 text-base">Save Payroll</button><button type="button" onclick="showPage(\'dashboard\')" class="btn-secondary flex-1 py-3 text-base">Cancel</button></div></form></div>';
       container.innerHTML = html;
     }
 
     function updateSalaryCalc() {
       var select = document.getElementById('employeeSelect');
       var option = select.options[select.selectedIndex];
-      var salary = option.getAttribute('data-salary') || 0;
-      document.getElementById('contractedSalary').value = salary;
+      document.getElementById('contractedSalary').value = option.getAttribute('data-salary') || 0;
       calcActualSalary();
     }
 
@@ -441,31 +341,20 @@
       var contracted = parseFloat(document.getElementById('contractedSalary').value) || 0;
       var totalDays = parseInt(document.getElementById('totalDays').value) || 28;
       var daysWorked = parseInt(document.getElementById('daysWorked').value) || 28;
-      var actual = (contracted * daysWorked) / totalDays;
-      document.getElementById('actualSalary').value = actual.toFixed(2);
+      document.getElementById('actualSalary').value = ((contracted * daysWorked) / totalDays).toFixed(2);
       calcNetPayable();
     }
 
     function calcNetPayable() {
       var actual = parseFloat(document.getElementById('actualSalary').value) || 0;
       var fields = document.querySelectorAll('.calc-field');
-      var bonuses = 0, leavePay = 0, gratuity = 0, otherEarnings = 0;
-      var penalties = 0, loansRepaid = 0, advanceSalary = 0, otherDeductions = 0;
-      
+      var add = 0, sub = 0;
       fields.forEach(function(f) {
         var val = parseFloat(f.value) || 0;
-        if (f.name === 'bonuses') bonuses = val;
-        else if (f.name === 'leavePay') leavePay = val;
-        else if (f.name === 'gratuity') gratuity = val;
-        else if (f.name === 'otherEarnings') otherEarnings = val;
-        else if (f.name === 'penalties') penalties = val;
-        else if (f.name === 'loansRepaid') loansRepaid = val;
-        else if (f.name === 'advanceSalary') advanceSalary = val;
-        else if (f.name === 'otherDeductions') otherDeductions = val;
+        if (['bonuses','leavePay','gratuity','otherEarnings'].includes(f.name)) add += val;
+        else sub += val;
       });
-      
-      var net = actual + bonuses + leavePay + gratuity + otherEarnings - penalties - loansRepaid - advanceSalary - otherDeductions;
-      document.getElementById('netPayableDisplay').textContent = net.toFixed(2);
+      document.getElementById('netPayableDisplay').textContent = (actual + add - sub).toFixed(2);
     }
 
     async function submitPayroll(e) {
@@ -473,70 +362,47 @@
       var fd = new FormData(e.target);
       var empId = fd.get('employeeId') || document.getElementById('employeeSelect').value;
       var emp = employees.find(function(e) { return e.id === empId; });
-      
-      var month = parseInt(fd.get('month'));
-      var year = parseInt(fd.get('year'));
-      var totalDays = parseInt(fd.get('totalDays')) || 28;
-      var daysWorked = parseInt(fd.get('daysWorked')) || 28;
-      var contractedSalary = emp.base_salary;
-      var actualSalary = (contractedSalary * daysWorked) / totalDays;
-      
-      var bonuses = parseFloat(fd.get('bonuses')) || 0;
-      var penalties = parseFloat(fd.get('penalties')) || 0;
-      var leavePay = parseFloat(fd.get('leavePay')) || 0;
-      var gratuity = parseFloat(fd.get('gratuity')) || 0;
-      var otherEarnings = parseFloat(fd.get('otherEarnings')) || 0;
-      var loansRepaid = parseFloat(fd.get('loansRepaid')) || 0;
-      var otherDeductions = parseFloat(fd.get('otherDeductions')) || 0;
-      var advanceSalary = parseFloat(fd.get('advanceSalary')) || 0;
+      var month = parseInt(fd.get('month')), year = parseInt(fd.get('year'));
+      var totalDays = parseInt(fd.get('totalDays')), daysWorked = parseInt(fd.get('daysWorked'));
+      var contracted = emp.base_salary;
+      var actual = (contracted * daysWorked) / totalDays;
+      var add = parseFloat(fd.get('bonuses'))+parseFloat(fd.get('leavePay'))+parseFloat(fd.get('gratuity'))+parseFloat(fd.get('otherEarnings'));
+      var sub = parseFloat(fd.get('penalties'))+parseFloat(fd.get('loansRepaid'))+parseFloat(fd.get('advanceSalary'))+parseFloat(fd.get('otherDeductions'));
+      var net = actual + add - sub;
       var loansAdvanced = parseFloat(fd.get('loansAdvanced')) || 0;
 
-      var netPayable = actualSalary + bonuses + leavePay + gratuity + otherEarnings - penalties - loansRepaid - advanceSalary - otherDeductions;
-
-      var result = await sb.from('payroll_records').upsert({
-        employee_id: empId, month: month, year: year, total_days: totalDays, days_worked: daysWorked,
-        base_salary: contractedSalary, actual_salary: actualSalary,
-        bonuses: bonuses, bonuses_desc: fd.get('bonusesDesc'),
-        penalties: penalties, penalties_desc: fd.get('penaltiesDesc'),
-        leave_pay: leavePay, leave_pay_desc: fd.get('leavePayDesc'),
-        gratuity: gratuity, gratuity_desc: fd.get('gratuityDesc'),
-        other_earnings: otherEarnings, other_earnings_desc: fd.get('otherEarningsDesc'),
-        loans_repaid: loansRepaid, loans_repaid_desc: fd.get('loansRepaidDesc'),
-        advance_salary: advanceSalary, advance_salary_desc: fd.get('advanceSalaryDesc'),
-        other_deductions: otherDeductions, other_deductions_desc: fd.get('otherDeductionsDesc'),
-        net_payable: netPayable
+      await sb.from('payroll_records').upsert({
+        employee_id: empId, month, year, total_days: totalDays, days_worked: daysWorked,
+        base_salary: contracted, actual_salary: actual, net_payable: net,
+        bonuses: parseFloat(fd.get('bonuses')), bonuses_desc: fd.get('bonusesDesc'),
+        penalties: parseFloat(fd.get('penalties')), penalties_desc: fd.get('penaltiesDesc'),
+        leave_pay: parseFloat(fd.get('leavePay')), leave_pay_desc: fd.get('leavePayDesc'),
+        gratuity: parseFloat(fd.get('gratuity')), gratuity_desc: fd.get('gratuityDesc'),
+        other_earnings: parseFloat(fd.get('otherEarnings')), other_earnings_desc: fd.get('otherEarningsDesc'),
+        loans_repaid: parseFloat(fd.get('loansRepaid')), loans_repaid_desc: fd.get('loansRepaidDesc'),
+        advance_salary: parseFloat(fd.get('advanceSalary')), advance_salary_desc: fd.get('advanceSalaryDesc'),
+        other_deductions: parseFloat(fd.get('otherDeductions')), other_deductions_desc: fd.get('otherDeductionsDesc')
       }, { onConflict: 'employee_id,month,year' });
 
-      if (result.error) { alert('Error: ' + result.error.message); return; }
-
-      if (loansAdvanced > 0) {
-        var currentBalance = emp.loan_balance || 0;
-        var newBalance = currentBalance + loansAdvanced - loansRepaid;
-        await sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: fd.get('loansAdvancedDesc'), balance_after: newBalance });
-        await sb.from('employees').update({ loan_balance: newBalance }).eq('id', empId);
-      } else if (loansRepaid > 0) {
-        var currentBalance = emp.loan_balance || 0;
-        var newBalance = currentBalance - loansRepaid;
-        await sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: loansRepaid, description: fd.get('loansRepaidDesc') || 'Loan repayment', balance_after: newBalance });
-        await sb.from('employees').update({ loan_balance: newBalance }).eq('id', empId);
+      if (loansAdvanced > 0 || parseFloat(fd.get('loansRepaid')) > 0) {
+        var curBal = emp.loan_balance || 0;
+        var newBal = curBal + loansAdvanced - parseFloat(fd.get('loansRepaid'));
+        if (loansAdvanced > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'advanced', amount: loansAdvanced, description: fd.get('loansAdvancedDesc'), balance_after: newBal });
+        if (parseFloat(fd.get('loansRepaid')) > 0) await sb.from('loan_transactions').insert({ employee_id: empId, type: 'repaid', amount: parseFloat(fd.get('loansRepaid')), description: fd.get('loansRepaidDesc')||'Repayment', balance_after: newBal });
+        await sb.from('employees').update({ loan_balance: newBal }).eq('id', empId);
       }
-
-      alert('Payroll saved successfully! Net Payable: $' + netPayable.toFixed(2));
-      loadData();
+      alert('Saved! Net: $' + net.toFixed(2)); loadData();
     }
 
     function renderBulkPayroll(container) {
       var today = new Date();
-      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Bulk Payroll</h1><p class="text-gray-500">Process payroll for all employees at once</p></div>' +
-        '<div class="card p-8">' +
-        '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month</label><select id="bulkMonth" class="input-field"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4" ' + (today.getMonth()+1 === 4 ? 'selected' : '') + '>April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>' +
+      container.innerHTML = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Bulk Payroll</h1><p class="text-gray-500">Process all active employees at once</p></div>' +
+        '<div class="card p-8"><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">' +
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Month</label><select id="bulkMonth" class="input-field"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select></div>' +
           '<div><label class="block text-sm font-medium text-gray-700 mb-2">Year</label><input type="number" id="bulkYear" value="' + today.getFullYear() + '" class="input-field"></div>' +
-          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Total Days</label><input type="number" id="bulkTotalDays" value="28" class="input-field"></div>' +
-        '</div>' +
-        '<button onclick="processBulkPayroll()" class="btn-primary w-full py-3 text-base">Process All Active Employees</button>' +
-        '</div>';
-      container.innerHTML = html;
+          '<div><label class="block text-sm font-medium text-gray-700 mb-2">Total Days</label><input type="number" id="bulkTotalDays" value="' + getDaysInMonth(today.getMonth()+1, today.getFullYear()) + '" class="input-field"></div>' +
+        '</div><button onclick="processBulkPayroll()" class="btn-primary w-full py-3">Process All Active Employees</button></div>';
+      document.getElementById('bulkMonth').value = today.getMonth() + 1;
     }
 
     async function processBulkPayroll() {
@@ -544,127 +410,76 @@
       var year = parseInt(document.getElementById('bulkYear').value);
       var totalDays = parseInt(document.getElementById('bulkTotalDays').value) || 28;
       var activeEmps = employees.filter(function(e) { return e.status === 'active'; });
-      var count = 0;
-      
       for (var i = 0; i < activeEmps.length; i++) {
         var emp = activeEmps[i];
         await sb.from('payroll_records').upsert({
-          employee_id: emp.id, month: month, year: year, total_days: totalDays, days_worked: totalDays,
-          base_salary: emp.base_salary, actual_salary: emp.base_salary,
-          bonuses: 0, penalties: 0, leave_pay: 0, gratuity: 0, other_earnings: 0,
-          loans_repaid: 0, advance_salary: 0, other_deductions: 0, net_payable: emp.base_salary
+          employee_id: emp.id, month, year, total_days: totalDays, days_worked: totalDays,
+          base_salary: emp.base_salary, actual_salary: emp.base_salary, net_payable: emp.base_salary,
+          bonuses: 0, penalties: 0, leave_pay: 0, gratuity: 0, other_earnings: 0, loans_repaid: 0, advance_salary: 0, other_deductions: 0
         }, { onConflict: 'employee_id,month,year' });
-        count++;
       }
-      
-      alert('Processed payroll for ' + count + ' employees');
-      loadData();
+      alert('Processed ' + activeEmps.length + ' employees'); loadData();
     }
 
     function renderLoans(container) {
-      var totalOutstanding = 0, employeesWithLoans = 0;
-      employees.forEach(function(e) { totalOutstanding += parseFloat(e.loan_balance||0); if(e.loan_balance > 0) employeesWithLoans++; });
-
-      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Loan Management</h1><p class="text-gray-500">Track employee loans and repayments</p></div>' +
+      var totalOut = 0, withLoans = 0;
+      employees.forEach(function(e) { totalOut += parseFloat(e.loan_balance||0); if(e.loan_balance>0) withLoans++; });
+      var html = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Loan Management</h1><p class="text-gray-500">Track advances & repayments</p></div>' +
         '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Total Outstanding</p><span class="text-2xl">💳</span></div><p class="text-3xl font-bold text-red-600">$' + totalOutstanding.toFixed(2) + '</p></div>' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Employees with Loans</p><span class="text-2xl">👥</span></div><p class="text-3xl font-bold text-blue-600">' + employeesWithLoans + '</p></div>' +
-          '<div class="metric-card"><div class="flex items-center justify-between mb-2"><p class="text-sm text-gray-500 font-medium">Total Transactions</p><span class="text-2xl">📋</span></div><p class="text-3xl font-bold text-purple-600">' + loanTransactions.length + '</p></div>' +
-        '</div>' +
-        '<div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b border-gray-200"><tr><th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Current Balance</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Total Advanced</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Total Repaid</th></tr></thead><tbody>';
-      
+          '<div class="metric-card"><p class="text-sm text-gray-500">Total Outstanding</p><p class="text-3xl font-bold text-red-600 mt-1">$' + totalOut.toFixed(2) + '</p></div>' +
+          '<div class="metric-card"><p class="text-sm text-gray-500">Employees with Loans</p><p class="text-3xl font-bold text-blue-600 mt-1">' + withLoans + '</p></div>' +
+          '<div class="metric-card"><p class="text-sm text-gray-500">Transactions</p><p class="text-3xl font-bold text-purple-600 mt-1">' + loanTransactions.length + '</p></div>' +
+        '</div><div class="card overflow-hidden"><table class="w-full"><thead class="bg-gray-50 border-b"><tr><th class="text-left py-4 px-6 font-semibold text-gray-700">Employee</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Balance</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Total Advanced</th><th class="text-left py-4 px-6 font-semibold text-gray-700">Total Repaid</th></tr></thead><tbody>';
       employees.forEach(function(emp) {
         var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });
-        var totalAdv = 0, totalRep = 0;
-        empLoans.forEach(function(r) { if (r.type === 'advanced') totalAdv += r.amount; else totalRep += r.amount; });
-        html += '<tr class="table-row border-b border-gray-100"><td class="py-4 px-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">' + emp.name.charAt(0) + '</div><p class="font-semibold text-gray-900">' + emp.name + '</p></div></td>' +
-          '<td class="py-4 px-6"><span class="' + (emp.loan_balance > 0 ? 'text-red-600 font-bold' : 'text-green-600') + '">$' + (emp.loan_balance||0).toFixed(2) + '</span></td>' +
-          '<td class="py-4 px-6 text-red-600 font-medium">$' + totalAdv.toFixed(2) + '</td>' +
-          '<td class="py-4 px-6 text-green-600 font-medium">$' + totalRep.toFixed(2) + '</td></tr>';
+        var adv = 0, rep = 0;
+        empLoans.forEach(function(r) { if(r.type==='advanced') adv+=r.amount; else rep+=r.amount; });
+        html += '<tr class="table-row border-b"><td class="py-4 px-6 font-semibold">' + emp.name + '</td><td class="py-4 px-6 ' + (emp.loan_balance>0?'text-red-600 font-bold':'text-green-600') + '">$' + (emp.loan_balance||0).toFixed(2) + '</td><td class="py-4 px-6 text-red-600">$' + adv.toFixed(2) + '</td><td class="py-4 px-6 text-green-600">$' + rep.toFixed(2) + '</td></tr>';
       });
-      
       html += '</tbody></table></div>';
       container.innerHTML = html;
     }
 
     function renderReports(container) {
-      container.innerHTML = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Reports</h1><p class="text-gray-500">Export and analyze payroll data</p></div>' +
+      container.innerHTML = '<div class="mb-8"><h1 class="text-3xl font-bold text-gray-900 mb-2">Reports</h1><p class="text-gray-500">Export payroll & loan data</p></div>' +
         '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">' +
-          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportMonthlyReport()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">📊</span><h3 class="font-bold text-gray-900">Monthly Summary</h3></div><p class="text-gray-500 text-sm">Export monthly payroll summary with all details</p></div>' +
-          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportLoanReport()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">💳</span><h3 class="font-bold text-gray-900">Loan Report</h3></div><p class="text-gray-500 text-sm">Employee loan balances and transactions</p></div>' +
-          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportAllPayroll()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">📋</span><h3 class="font-bold text-gray-900">All Records</h3></div><p class="text-gray-500 text-sm">Complete payroll history export</p></div>' +
-          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportAllLoans()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">💰</span><h3 class="font-bold text-gray-900">Loan Transactions</h3></div><p class="text-gray-500 text-sm">All loan advances and repayments</p></div>' +
-          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportExcelFormat()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">📑</span><h3 class="font-bold text-gray-900">Excel Format</h3></div><p class="text-gray-500 text-sm">Match your existing Excel layout</p></div>' +
+          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportMonthlyReport()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">📊</span><h3 class="font-bold text-gray-900">Monthly Summary</h3></div><p class="text-gray-500 text-sm">Export monthly payroll details</p></div>' +
+          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportLoanReport()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">💳</span><h3 class="font-bold text-gray-900">Loan Report</h3></div><p class="text-gray-500 text-sm">Employee loan balances</p></div>' +
+          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportAllPayroll()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">📋</span><h3 class="font-bold text-gray-900">All Records</h3></div><p class="text-gray-500 text-sm">Complete payroll history</p></div>' +
+          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportAllLoans()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">💰</span><h3 class="font-bold text-gray-900">Loan Transactions</h3></div><p class="text-gray-500 text-sm">All advances & repayments</p></div>' +
+          '<div class="card p-6 hover:shadow-lg transition cursor-pointer" onclick="exportExcelFormat()"><div class="flex items-center gap-3 mb-3"><span class="text-3xl">📑</span><h3 class="font-bold text-gray-900">Excel Format</h3></div><p class="text-gray-500 text-sm">Matches your existing layout</p></div>' +
         '</div>';
     }
 
     function exportMonthlyReport() {
-      var csv = 'Month,Year,Employee,Contracted Salary,Days Worked,Actual Salary,Bonuses,Penalties,Leave Pay,Gratuity,Advance,Loan Repaid,Net Payable\n';
-      payrollRecords.forEach(function(r) {
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });
-        csv += r.month + ',' + r.year + ',' + (emp?emp.name:'Unknown') + ',' + r.base_salary + ',' + (r.days_worked||28) + ',' + (r.actual_salary||r.base_salary) + ',' + (r.bonuses||0) + ',' + (r.penalties||0) + ',' + (r.leave_pay||0) + ',' + (r.gratuity||0) + ',' + (r.advance_salary||0) + ',' + (r.loans_repaid||0) + ',' + r.net_payable + '\n';
-      });
-      downloadCSV(csv, 'monthly-payroll-report.csv');
+      var csv = 'Month,Year,Employee,Contracted,Days,Actual,Bonuses,Penalties,Leave,Gratuity,Advance,Loan Rep,Net\n';
+      payrollRecords.forEach(function(r) { var e = employees.find(function(x){return x.id===r.employee_id;}); csv += r.month+','+r.year+','+(e?e.name:'?')+','+r.base_salary+','+(r.days_worked||28)+','+(r.actual_salary||r.base_salary)+','+(r.bonuses||0)+','+(r.penalties||0)+','+(r.leave_pay||0)+','+(r.gratuity||0)+','+(r.advance_salary||0)+','+(r.loans_repaid||0)+','+r.net_payable+'\n'; });
+      downloadCSV(csv, 'monthly-payroll.csv');
     }
-
     function exportExcelFormat() {
-      var csv = 'No,Description,Position,Contracted Salary,No. of Days Work,Actual Salary,Advance,Cash Bal,Loan Return,Total Net Out\n';
-      var num = 1;
-      payrollRecords.forEach(function(r) {
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });
-        csv += num + ',' + (emp?emp.name:'Unknown') + ',' + (emp?emp.role:'') + ',' + r.base_salary + ',' + (r.days_worked||28) + ',' + (r.actual_salary||r.base_salary) + ',' + (r.advance_salary||0) + ',' + (r.net_payable) + ',' + (r.loans_repaid||0) + ',' + r.net_payable + '\n';
-        num++;
-      });
+      var csv = 'No,Description,Position,Contracted Salary,Days Work,Actual Salary,Advance,Cash Bal,Loan Return,Total Net Out\n';
+      var n=1; payrollRecords.forEach(function(r){var e=employees.find(function(x){return x.id===r.employee_id;}); csv+=n+','+(e?e.name:'?')+','+(e?e.role:'')+','+r.base_salary+','+(r.days_worked||28)+','+(r.actual_salary||r.base_salary)+','+(r.advance_salary||0)+','+r.net_payable+','+(r.loans_repaid||0)+','+r.net_payable+'\n'; n++;});
       downloadCSV(csv, 'payroll-excel-format.csv');
     }
-
     function exportLoanReport() {
-      var csv = 'Employee,Current Balance,Total Advanced,Total Repaid\n';
-      employees.forEach(function(emp) {
-        var empLoans = loanTransactions.filter(function(r) { return r.employee_id === emp.id; });
-        var totalAdv = 0, totalRep = 0;
-        empLoans.forEach(function(r) { if (r.type === 'advanced') totalAdv += r.amount; else totalRep += r.amount; });
-        csv += emp.name + ',' + (emp.loan_balance||0) + ',' + totalAdv + ',' + totalRep + '\n';
-      });
+      var csv='Employee,Current Balance,Total Advanced,Total Repaid\n';
+      employees.forEach(function(emp){var lo=loanTransactions.filter(function(r){return r.employee_id===emp.id;});var a=0,p=0;lo.forEach(function(r){if(r.type==='advanced')a+=r.amount;else p+=r.amount;});csv+=emp.name+','+(emp.loan_balance||0)+','+a+','+p+'\n';});
       downloadCSV(csv, 'loan-report.csv');
     }
-
     function exportAllPayroll() {
-      var csv = 'Month,Year,Employee,Contracted,Days,Actual,Bonuses,Penalties,Leave,Gratuity,Advance,Loans Repaid,Net\n';
-      payrollRecords.forEach(function(r) {
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });
-        csv += r.month + ',' + r.year + ',' + (emp?emp.name:'Unknown') + ',' + r.base_salary + ',' + (r.days_worked||28) + ',' + (r.actual_salary||r.base_salary) + ',' + (r.bonuses||0) + ',' + (r.penalties||0) + ',' + (r.leave_pay||0) + ',' + (r.gratuity||0) + ',' + (r.advance_salary||0) + ',' + (r.loans_repaid||0) + ',' + r.net_payable + '\n';
-      });
-      downloadCSV(csv, 'all-payroll-records.csv');
+      var csv='Month,Year,Employee,Contracted,Days,Actual,Bonuses,Penalties,Leave,Gratuity,Advance,Loans Rep,Net\n';
+      payrollRecords.forEach(function(r){var e=employees.find(function(x){return x.id===r.employee_id;});csv+=r.month+','+r.year+','+(e?e.name:'?')+','+r.base_salary+','+(r.days_worked||28)+','+(r.actual_salary||r.base_salary)+','+(r.bonuses||0)+','+(r.penalties||0)+','+(r.leave_pay||0)+','+(r.gratuity||0)+','+(r.advance_salary||0)+','+(r.loans_repaid||0)+','+r.net_payable+'\n';});
+      downloadCSV(csv, 'all-payroll.csv');
     }
-
     function exportAllLoans() {
-      var csv = 'Date,Employee,Type,Amount,Description,Balance After\n';
-      loanTransactions.forEach(function(r) {
-        var emp = employees.find(function(e) { return e.id === r.employee_id; });
-        csv += new Date(r.created_at).toLocaleDateString() + ',' + (emp?emp.name:'Unknown') + ',' + r.type + ',' + r.amount + ',' + (r.description||'') + ',' + r.balance_after + '\n';
-      });
-      downloadCSV(csv, 'all-loan-transactions.csv');
+      var csv='Date,Employee,Type,Amount,Description,Balance\n';
+      loanTransactions.forEach(function(r){var e=employees.find(function(x){return x.employee_id===r.employee_id;});csv+=new Date(r.created_at).toLocaleDateString()+','+(e?e.name:'?')+','+r.type+','+r.amount+','+(r.description||'')+','+r.balance_after+'\n';});
+      downloadCSV(csv, 'all-loans.csv');
     }
+    function downloadCSV(csv, fn) { var b=new Blob([csv],{type:'text/csv'}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=fn; a.click(); }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
-    function downloadCSV(csv, filename) {
-      var blob = new Blob([csv], { type: 'text/csv' });
-      var url = window.URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-    }
-
-    (function() {
-      sb.auth.getSession().then(function(result) {
-        if (result.data && result.data.session) initApp();
-      });
-    })();
+    (function() { sb.auth.getSession().then(function(r){ if(r.data&&r.data.session) initApp(); }); })();
   </script>
 </body>
 </html>
